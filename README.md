@@ -53,20 +53,17 @@ The end-user experience is greatly enhanced by a set of user interaction feature
 This section explains how to add the Uno Charts to your application and use its basic features.
 
 **Step 1**
-Download the Syncfusion Chart Uno Source here.
-
-**Step 2**
 Add Syncfusion.SfChart.Uno source project into your application solution.
 
-**Step 3**
+**Step 2**
 Refer the source to all platforms project.
 
-**Step 4**
+**Step 3**
 Import the SfChart namespace as shown below in your respective Page,
 ```xml
 xmlns:syncfusion="using:Syncfusion.UI.Xaml.Charts"
 ```
-**Step 5**
+**Step 4**
 Then initialize an empty chart with two axes as shown below,
 ```xml
 <syncfusion:SfChart> 
@@ -78,7 +75,7 @@ Then initialize an empty chart with two axes as shown below,
       </syncfusion:SfChart.SecondaryAxis>
 </syncfusion:SfChart>
 ```
-**Step 6** 
+**Step 5** 
 
 **Populate Chart with data** - As we are going to visualize the comparison of heights in the data model, add ColumnSeries to SfChart.Series property, and then bind the Data property of the ViewModel to the ColumnSeries.ItemsSource property and You need to set XBindingPath and YBindingPath properties, so that SfChart would fetch values from the respective properties in the data model to plot the series.
   
