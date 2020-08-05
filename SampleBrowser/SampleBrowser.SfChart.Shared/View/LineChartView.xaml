@@ -1,0 +1,110 @@
+﻿<Page
+    x:Class="SampleBrowser.SfChart.LineChartView"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:SampleBrowser.SfChart"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d"
+    xmlns:toolkit="using:Uno.UI.Toolkit"
+     xmlns:chart="using:Syncfusion.UI.Xaml.Charts"
+    Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
+
+    <Page.DataContext>
+        <local:LineChartViewModel/>
+    </Page.DataContext>
+    <Grid >
+        <Grid.RowDefinitions>
+            <RowDefinition />
+            <RowDefinition />
+        </Grid.RowDefinitions>
+        <Grid Margin="2">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
+            <TextBlock HorizontalAlignment="Left" VerticalAlignment="Center"
+                        FontFamily="Segoe UI"
+                       Margin="2" FontSize="18" Text="Line Chart"/>
+            <Grid   BorderThickness="1" BorderBrush="LightGray" Margin="5" Grid.Row="1">
+                <chart:SfChart  AreaBorderThickness="0" Margin="5,0,5,0" >
+                    <chart:SfChart.Header>
+                        <TextBlock FontSize="14" Foreground="Black"
+                         FontFamily="Segoe UI"
+                         Margin="0,5,0,5">Weather Report - China</TextBlock>
+                    </chart:SfChart.Header>
+
+                    <chart:SfChart.PrimaryAxis>
+                        <chart:CategoryAxis ShowGridLines="False" LabelPlacement="BetweenTicks"/>
+                    </chart:SfChart.PrimaryAxis>
+                    <chart:SfChart.SecondaryAxis>
+                        <chart:NumericalAxis TickLineSize="0" Header="Temparature ( in °C )"
+                                      EdgeLabelsDrawingMode="Shift" LabelFormat="##.##"
+                                             RangePadding="Additional" Interval="3"
+                                             ShowGridLines="False">
+                            <chart:NumericalAxis.AxisLineStyle>
+                                <Style TargetType="Line">
+                                    <Setter Property="Stroke" Value="Transparent"/>
+                                </Style>
+                            </chart:NumericalAxis.AxisLineStyle>
+                        </chart:NumericalAxis>
+                    </chart:SfChart.SecondaryAxis>
+                    <chart:LineSeries  ItemsSource="{Binding Data}" ShowTooltip="True"
+                             XBindingPath="XValue" YBindingPath="YValue" >
+                        <chart:LineSeries.AdornmentsInfo>
+                            <chart:ChartAdornmentInfo ShowLabel="True"    UseSeriesPalette="True"   >
+                            </chart:ChartAdornmentInfo>
+                        </chart:LineSeries.AdornmentsInfo>
+                    </chart:LineSeries>
+                    <chart:SfChart.Behaviors>
+                        <chart:ChartZoomPanBehavior />
+                    </chart:SfChart.Behaviors>
+                </chart:SfChart>
+            </Grid>
+        </Grid>
+        <Grid Grid.Row="1" Margin="2">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
+            <TextBlock HorizontalAlignment="Left" Margin="2" FontSize="18"
+                        FontFamily="Segoe UI"
+                       Text="Spline Chart"/>
+            <Grid   BorderThickness="1" BorderBrush="LightGray" Margin="5" Grid.Row="1">
+                <chart:SfChart AreaBorderThickness="0" Margin="5,0,5,0" >
+                    <chart:SfChart.Behaviors>
+                        <chart:ChartZoomPanBehavior />
+                    </chart:SfChart.Behaviors>
+                    <chart:SfChart.Header>
+                        <TextBlock FontSize="14" Foreground="Black"
+                         FontFamily="Segoe UI"
+                         Margin="0,5,0,5">Profit of X product - [1995 - 2005]</TextBlock>
+                    </chart:SfChart.Header>
+
+                    <chart:SfChart.PrimaryAxis>
+                        <chart:CategoryAxis ShowGridLines="False"
+                                            Header="Year"
+                                            LabelPlacement="BetweenTicks"/>
+                    </chart:SfChart.PrimaryAxis>
+                    <chart:SfChart.SecondaryAxis>
+                        <chart:NumericalAxis TickLineSize="0" Header="Profit ( in $ )" LabelFormat="##.##"
+                                             RangePadding="Additional"   EdgeLabelsDrawingMode="Shift" 
+                                             ShowGridLines="False">
+                            <chart:NumericalAxis.AxisLineStyle>
+                                <Style TargetType="Line">
+                                    <Setter Property="Stroke" Value="Transparent"/>
+                                </Style>
+                            </chart:NumericalAxis.AxisLineStyle>
+                        </chart:NumericalAxis>
+                    </chart:SfChart.SecondaryAxis>
+                    <chart:SplineSeries  ItemsSource="{Binding SplineData}" ShowTooltip="True"
+                             XBindingPath="XValue" YBindingPath="YValue" >
+                        <chart:SplineSeries.AdornmentsInfo>
+                            <chart:ChartAdornmentInfo ShowLabel="True"    UseSeriesPalette="True"   />
+                        </chart:SplineSeries.AdornmentsInfo>
+                    </chart:SplineSeries>
+                </chart:SfChart>
+            </Grid>
+        </Grid>
+    </Grid>
+</Page>

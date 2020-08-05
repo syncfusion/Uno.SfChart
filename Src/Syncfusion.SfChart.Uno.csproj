@@ -1,0 +1,82 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project Sdk="MSBuild.Sdk.Extras/2.0.54">
+  <PropertyGroup>
+    <TargetFrameworks>netstandard2.0;xamarinios10;monoandroid90;uap10.0.18362</TargetFrameworks>
+    <!-- Ensures the .xr.xml files are generated in a proper layout folder -->
+    <GenerateLibraryLayout>true</GenerateLibraryLayout>
+    <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
+    <Copyright>Syncfusion</Copyright>
+    <Description>Syncfusion Chart control for Uno</Description>
+    <PackageProjectUrl>https://www.syncfusion.com</PackageProjectUrl>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(TargetFramework)'=='netstandard2.0'">
+    <DefineConstants>TRACE;__WASM__;NETFX_CORE;WINDOWS_UAP;SyncfusionFramework4_6;UNIVERSALWINDOWS;Uno;</DefineConstants>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(TargetFramework)'=='xamarinios10'  or '$(TargetFramework)'=='monoandroid90' or '$(TargetFramework)'=='uap10.0.18362'">
+    <DefineConstants>TRACE;NETFX_CORE;WINDOWS_UAP;SyncfusionFramework4_6;UNIVERSALWINDOWS;Uno;</DefineConstants>
+  </PropertyGroup>
+  <ItemGroup Condition="'$(TargetFramework)'=='xamarinios10' or '$(TargetFramework)'=='monoandroid90' or '$(TargetFramework)'=='netstandard2.0'">
+    <PackageReference Include="Uno.UI" Version="3.0.0-dev.1004" />
+  </ItemGroup>
+  <PropertyGroup Condition="'$(TargetFramework)'=='monoandroid90'">
+    <DesignTimeBuild>false</DesignTimeBuild>
+  </PropertyGroup>
+  <ItemGroup>
+    <Page Include="**\*.xaml" Exclude="bin\**\*.xaml;obj\**\*.xaml" />
+    <Compile Update="**\*.xaml.cs">
+      <DependentUpon>%(Filename)</DependentUpon>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <UpToDateCheckInput Include="**\*.xaml" Exclude="bin\**\*.xaml;obj\**\*.xaml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Remove="Serialization\**" />
+    <EmbeddedResource Remove="Serialization\**" />
+    <None Remove="Serialization\**" />
+    <Page Remove="Serialization\**" />
+    <UpToDateCheckInput Remove="Serialization\**" />
+  </ItemGroup>
+  <ItemGroup>
+    <PRIResource Include="Resources\en-US\Syncfusion.SfChart.Uno.Resources.resw" />
+    <None Remove="Themes\ChartArea.xaml" />
+    <None Remove="Themes\ChartAxis.xaml" />
+    <None Remove="Themes\ChartSeries.xaml" />
+    <None Remove="Themes\ChartSeries3D.xaml" />
+    <None Remove="Themes\ChartToolBar.xaml" />
+    <None Remove="Themes\Generic.Common.xaml" />
+    <None Remove="Themes\Generic.Legend.xaml" />
+    <None Remove="Themes\Generic.Symbol.xaml" />
+    <None Remove="Themes\generic.xaml" />
+    <None Remove="Themes\ResizableScrollBar.xaml" />
+    <None Remove="Themes\Resizer.xaml" />
+    <None Remove="Themes\SfChart3D.xaml" />
+    <None Remove="Themes\SfRangeNavigator.xaml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Page Remove="Themes\SfRangeNavigator.xaml" />
+  </ItemGroup>
+  <ItemGroup>
+    <UpToDateCheckInput Remove="Themes\ChartArea.xaml" />
+    <UpToDateCheckInput Remove="Themes\ChartAxis.xaml" />
+    <UpToDateCheckInput Remove="Themes\ChartSeries.xaml" />
+    <UpToDateCheckInput Remove="Themes\ChartSeries3D.xaml" />
+    <UpToDateCheckInput Remove="Themes\ChartToolBar.xaml" />
+    <UpToDateCheckInput Remove="Themes\Generic.Common.xaml" />
+    <UpToDateCheckInput Remove="Themes\Generic.Legend.xaml" />
+    <UpToDateCheckInput Remove="Themes\Generic.Symbol.xaml" />
+    <UpToDateCheckInput Remove="Themes\generic.xaml" />
+    <UpToDateCheckInput Remove="Themes\ResizableScrollBar.xaml" />
+    <UpToDateCheckInput Remove="Themes\Resizer.xaml" />
+    <UpToDateCheckInput Remove="Themes\SfChart3D.xaml" />
+    <UpToDateCheckInput Remove="Themes\SfRangeNavigator.xaml" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Resources\en-US\Syncfusion.SfChart.Uno.Resources.resw" />
+  </ItemGroup>
+	<ItemGroup Condition="'$(TargetFramework)'=='netstandard2.0'">
+		<EmbeddedResource Include="LinkerDefinition.Wasm.xml">
+			<LogicalName>$(AssemblyName).xml</LogicalName>
+		</EmbeddedResource>
+	</ItemGroup>
+</Project>

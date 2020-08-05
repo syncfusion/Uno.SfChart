@@ -1,0 +1,126 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <MSBuildAllProjects>$(MSBuildAllProjects);$(MSBuildThisFileFullPath)</MSBuildAllProjects>
+    <HasSharedItems>true</HasSharedItems>
+    <SharedGUID>6279c845-92f8-4333-ab99-3d213163593c</SharedGUID>
+  </PropertyGroup>
+  <PropertyGroup Label="Configuration">
+    <Import_RootNamespace>SampleBrowser.SfChart.Shared</Import_RootNamespace>
+  </PropertyGroup>
+  <ItemGroup>
+    <ApplicationDefinition Include="$(MSBuildThisFileDirectory)App.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </ApplicationDefinition>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="$(MSBuildThisFileDirectory)App.xaml.cs">
+      <DependentUpon>App.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="$(MSBuildThisFileDirectory)MainPage.xaml.cs">
+      <DependentUpon>MainPage.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="$(MSBuildThisFileDirectory)Model\LineChartModel.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Model\PieChartModel.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Model\PlantDataModel.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Model\StackedChartModel.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Model\TriangularChartModel.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)ViewModel\AreaChartViewModel.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)ViewModel\BubbleChartViewModel.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)ViewModel\ColumnChartViewModel.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)ViewModel\LineChartViewModel.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)ViewModel\PieChartViewModel.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)ViewModel\PolarChartViewModel.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)ViewModel\StackedChartViewModel.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)ViewModel\TriangularChartViewModel.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)View\AreaChartView.xaml.cs">
+      <DependentUpon>AreaChartView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="$(MSBuildThisFileDirectory)View\BarChartView.xaml.cs">
+      <DependentUpon>BarChartView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="$(MSBuildThisFileDirectory)View\BubbleChartView.xaml.cs">
+      <DependentUpon>BubbleChartView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="$(MSBuildThisFileDirectory)View\ColumnChartView.xaml.cs">
+      <DependentUpon>ColumnChartView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="$(MSBuildThisFileDirectory)View\DoughtnutChartView.xaml.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)View\LineChartView.xaml.cs">
+      <DependentUpon>LineChartView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="$(MSBuildThisFileDirectory)View\PieChartView.xaml.cs">
+      <DependentUpon>PieChartView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="$(MSBuildThisFileDirectory)View\ScatterChartView.xaml.cs">
+      <DependentUpon>ScatterChartView.xaml</DependentUpon>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <Page Include="$(MSBuildThisFileDirectory)MainPage.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="$(MSBuildThisFileDirectory)View\AreaChartView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="$(MSBuildThisFileDirectory)View\BarChartView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="$(MSBuildThisFileDirectory)View\BubbleChartView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="$(MSBuildThisFileDirectory)View\ColumnChartView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="$(MSBuildThisFileDirectory)View\DoughnutChartView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="$(MSBuildThisFileDirectory)View\LineChartView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="$(MSBuildThisFileDirectory)View\PieChartView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="$(MSBuildThisFileDirectory)View\ScatterChartView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="$(MSBuildThisFileDirectory)Assets\AreaChart.png" />
+    <Content Include="$(MSBuildThisFileDirectory)Assets\axis.png" />
+    <Content Include="$(MSBuildThisFileDirectory)Assets\BarChart.png" />
+    <Content Include="$(MSBuildThisFileDirectory)Assets\BubbleChart.png" />
+    <Content Include="$(MSBuildThisFileDirectory)Assets\ColumnChart.png" />
+    <Content Include="$(MSBuildThisFileDirectory)Assets\DoughnutChart.png" />
+    <Content Include="$(MSBuildThisFileDirectory)Assets\line.png" />
+    <Content Include="$(MSBuildThisFileDirectory)Assets\LineChart.png" />
+    <Content Include="$(MSBuildThisFileDirectory)Assets\lockscreenlogo.scale-200.png" />
+    <Content Include="$(MSBuildThisFileDirectory)Assets\Person.png" />
+    <Content Include="$(MSBuildThisFileDirectory)Assets\PieChart.png" />
+    <Content Include="$(MSBuildThisFileDirectory)Assets\RadarChart.png" />
+    <Content Include="$(MSBuildThisFileDirectory)Assets\RangeChart.png" />
+    <Content Include="$(MSBuildThisFileDirectory)Assets\ScatterChart.png" />
+    <Content Include="$(MSBuildThisFileDirectory)Assets\SharedAssets.md" />
+    <Content Include="$(MSBuildThisFileDirectory)Assets\splashscreen.scale-200.png" />
+    <Content Include="$(MSBuildThisFileDirectory)Assets\square150x150logo.scale-200.png" />
+    <Content Include="$(MSBuildThisFileDirectory)Assets\square44x44logo.scale-200.png" />
+    <Content Include="$(MSBuildThisFileDirectory)Assets\square44x44logo.targetsize-24_altform-unplated.png" />
+    <Content Include="$(MSBuildThisFileDirectory)Assets\StackedChart.png" />
+    <Content Include="$(MSBuildThisFileDirectory)Assets\storelogo.png" />
+    <Content Include="$(MSBuildThisFileDirectory)Assets\TriangularChart.png" />
+    <Content Include="$(MSBuildThisFileDirectory)Assets\wide310x150logo.scale-200.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <PRIResource Include="$(MSBuildThisFileDirectory)Strings\en\Resources.resw" />
+  </ItemGroup>
+</Project>

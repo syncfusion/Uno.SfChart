@@ -1,0 +1,65 @@
+﻿<Page
+    x:Class="SampleBrowser.SfChart.MainPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:SampleBrowser.SfChart"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+     xmlns:chart="using:Syncfusion.UI.Xaml.Charts"
+    mc:Ignorable="d">
+
+        <NavigationView   x:Name="navigationView" 
+                         TabIndex="0" 
+                        IsSettingsVisible="False" >
+            <NavigationView.MenuItems>
+                <NavigationViewItem Tapped="NavigationViewItem_Tapped" Content="Column Chart" Tag="Column" >
+                    <NavigationViewItem.Icon>
+                        <BitmapIcon UriSource="ColumnChart.png"/>
+                    </NavigationViewItem.Icon>
+                </NavigationViewItem>
+                <NavigationViewItem  Tapped="NavigationViewItem_Tapped" Content="Bar Chart" Tag="Bar" >
+                    <NavigationViewItem.Icon>
+                        <BitmapIcon UriSource="BarChart.png"/>
+                    </NavigationViewItem.Icon>
+                </NavigationViewItem>
+            <NavigationViewItem Tapped="NavigationViewItem_Tapped"  Content="Scatter Chart" Tag="Scatter">
+                <NavigationViewItem.Icon>
+                    <BitmapIcon UriSource="ScatterChart.png"/>
+                </NavigationViewItem.Icon>
+            </NavigationViewItem>
+            <NavigationViewItem  Tapped="NavigationViewItem_Tapped" Content="Line Chart" Tag="Line">
+                    <NavigationViewItem.Icon>
+                        <BitmapIcon UriSource="LineChart.png"/>
+                    </NavigationViewItem.Icon>
+                </NavigationViewItem>
+            <NavigationViewItem  Tapped="NavigationViewItem_Tapped" Content="Area Chart" Tag="Area">
+                <NavigationViewItem.Icon>
+                    <BitmapIcon UriSource="AreaChart.png"/>
+                </NavigationViewItem.Icon>
+            </NavigationViewItem>
+            <NavigationViewItem  Tapped="NavigationViewItem_Tapped" Content="Bubble Chart" Tag="Bubble">
+                <NavigationViewItem.Icon>
+                    <BitmapIcon UriSource="BubbleChart.png"/>
+                </NavigationViewItem.Icon>
+            </NavigationViewItem>
+            <NavigationViewItem  Tapped="NavigationViewItem_Tapped" Content="Pie Chart" Tag="Pie" >
+                    <NavigationViewItem.Icon>
+                        <BitmapIcon UriSource="PieChart.png"/>
+                    </NavigationViewItem.Icon>
+                </NavigationViewItem>
+            <NavigationViewItem   Tapped="NavigationViewItem_Tapped" Content="Doughnut Chart" Tag="Doughnut">
+                <NavigationViewItem.Icon>
+                    <BitmapIcon UriSource="DoughnutChart.png"/>
+                </NavigationViewItem.Icon>
+            </NavigationViewItem>
+        </NavigationView.MenuItems>
+            <Grid>
+                <Frame x:Name="contentFrame" Margin="0,30,0,0"></Frame>
+                <TextBlock Text="Syncfusion Uno Chart Explorer" HorizontalAlignment="Center"
+                           FontSize="18"
+                           x:Name="syncLabel"
+                           VerticalAlignment="Center" FontStretch="ExtraExpanded" FontWeight="SemiBold"/>
+            </Grid>
+        </NavigationView>
+    <!--</Grid>-->
+</Page>

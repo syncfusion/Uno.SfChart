@@ -1,0 +1,160 @@
+﻿<Page
+    x:Class="SampleBrowser.SfChart.BarChartView"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:SampleBrowser.SfChart"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d"
+    xmlns:toolkit="using:Uno.UI.Toolkit"
+     xmlns:chart="using:Syncfusion.UI.Xaml.Charts"
+    Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
+
+        <Page.DataContext>
+        <local:ColumnChartViewModel/>
+        </Page.DataContext>
+
+    <Grid >
+        <Grid.RowDefinitions>
+            <RowDefinition />
+            <RowDefinition />
+        </Grid.RowDefinitions>
+        <Grid Margin="2">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
+            <TextBlock HorizontalAlignment="Left" VerticalAlignment="Center"
+                        FontFamily="Segoe UI"
+                       Margin="2" FontSize="18" Text="Bar Chart"/>
+            <Grid   BorderThickness="1" BorderBrush="LightGray" Margin="5" Grid.Row="1">
+                <chart:SfChart AreaBorderThickness="0" Margin="5,0,5,5" >
+
+                    <chart:SfChart.Header>
+                        <TextBlock FontSize="14" Foreground="Black"
+                         FontFamily="Segoe UI"
+                         Margin="0,5,0,5">Olympic Medal Counts - RIO</TextBlock>
+                    </chart:SfChart.Header>
+
+                    <chart:SfChart.PrimaryAxis>
+                        <chart:CategoryAxis ShowGridLines="False" Visibility="Collapsed"
+                                            LabelRotationAngle="270" TickLineSize="0"
+                                            LabelPlacement="BetweenTicks">
+                            <chart:CategoryAxis.AxisLineStyle>
+                                <Style TargetType="Line">
+                                    <Setter Property="Stroke" Value="Transparent"/>
+                                </Style>
+                            </chart:CategoryAxis.AxisLineStyle>
+                        </chart:CategoryAxis>
+                    </chart:SfChart.PrimaryAxis>
+                    <chart:SfChart.SecondaryAxis>
+                        <chart:NumericalAxis Visibility="Collapsed"                                    
+                                     ShowGridLines="False"/>
+                    </chart:SfChart.SecondaryAxis>
+                    <chart:BarSeries  
+                             ItemsSource="{Binding Data}" ShowTooltip="True"
+                             XBindingPath="Country" YBindingPath="Count" Palette="Custom" >
+                        <chart:BarSeries.AdornmentsInfo>
+                            <chart:ChartAdornmentInfo ShowLabel="True"
+                                                      FontSize="16"
+                                                      LabelPosition="Inner" Foreground="Black"/>
+                        </chart:BarSeries.AdornmentsInfo>
+                        <chart:BarSeries.ColorModel>
+                            <chart:ChartColorModel>
+                                <chart:ChartColorModel.CustomBrushes>
+                                    <SolidColorBrush Color="#47ba9f"/>
+                                    <SolidColorBrush Color="#e58870"/>
+                                    <SolidColorBrush Color="#9686c9"/>
+                                    <SolidColorBrush Color="#e56590"/>
+                                    <SolidColorBrush Color="#f8b883"/> 
+                                </chart:ChartColorModel.CustomBrushes>
+                            </chart:ChartColorModel>
+                        </chart:BarSeries.ColorModel>
+                    </chart:BarSeries>
+                    <chart:SfChart.Behaviors>
+                        <chart:ChartSelectionBehavior EnableSegmentSelection="True" />
+                        <chart:ChartZoomPanBehavior />
+                    </chart:SfChart.Behaviors>
+                </chart:SfChart>
+            </Grid>
+        </Grid>
+        <Grid Margin="2" Grid.Row="1">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
+            <TextBlock HorizontalAlignment="Left" VerticalAlignment="Center"
+                        FontFamily="Segoe UI"
+                       Margin="2" FontSize="18" Text="Bar Chart With Track"/>
+            <Grid   BorderThickness="1" BorderBrush="LightGray" Margin="5" Grid.Row="1">
+                <chart:SfChart AreaBorderThickness="0" Margin="5,0,5,0" 
+                               SideBySideSeriesPlacement="False">
+                    <chart:SfChart.Resources>
+                        <DataTemplate x:Key="label">
+                            <Grid >
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition/>
+                                    <ColumnDefinition/>
+                                </Grid.ColumnDefinitions>
+                                <TextBlock Text="{Binding}" Foreground="White" />
+                                <TextBlock Grid.Column="1" Text=" %" Foreground="White" />
+                            </Grid>
+                        </DataTemplate>
+                    </chart:SfChart.Resources>
+                    <chart:SfChart.Header>
+                        <TextBlock FontSize="14" Foreground="Black"
+                         FontFamily="Segoe UI"
+                         Margin="0,20,0,10">Inflation - Consumer Price in UK [2005 - 2009]</TextBlock>
+                    </chart:SfChart.Header>
+
+                    <chart:SfChart.PrimaryAxis>
+                        <chart:CategoryAxis ShowGridLines="False" Visibility="Collapsed"
+                                            TickLineSize="0" LabelRotationAngle="270"
+                                            LabelPlacement="BetweenTicks">
+                            <chart:CategoryAxis.AxisLineStyle>
+                                <Style TargetType="Line">
+                                    <Setter Property="Stroke" Value="Transparent"/>
+                                </Style>
+                            </chart:CategoryAxis.AxisLineStyle>
+                        </chart:CategoryAxis>
+                    </chart:SfChart.PrimaryAxis>
+                    <chart:SfChart.SecondaryAxis>
+                        <chart:NumericalAxis   ShowGridLines="False"
+                                               Interval="20"  EdgeLabelsDrawingMode="Shift" 
+                                               TickLineSize="0">
+                            <chart:NumericalAxis.AxisLineStyle>
+                                <Style TargetType="Line">
+                                    <Setter Property="Stroke" Value="Transparent"/>
+                                </Style>
+                            </chart:NumericalAxis.AxisLineStyle>
+                        </chart:NumericalAxis>
+                    </chart:SfChart.SecondaryAxis>
+                    <chart:BarSeries  Interior="LightGray"
+                             ItemsSource="{Binding PercentageData}"
+                             XBindingPath="Year" YBindingPath="Count" />
+
+                    <chart:BarSeries  Palette="Custom"
+                             ItemsSource="{Binding PriceData}" ShowTooltip="True"
+                             XBindingPath="Year" YBindingPath="Count" >
+                        <chart:BarSeries.AdornmentsInfo>
+                            <chart:ChartAdornmentInfo ShowLabel="True"
+                                                      LabelPosition="Inner" />
+                        </chart:BarSeries.AdornmentsInfo>
+                        <chart:BarSeries.ColorModel>
+                            <chart:ChartColorModel>
+                                <chart:ChartColorModel.CustomBrushes>
+                                    <SolidColorBrush Color="#47ba9f"/>
+                                    <SolidColorBrush Color="#e58870"/>
+                                    <SolidColorBrush Color="#9686c9"/>
+                                    <SolidColorBrush Color="#e56590"/>
+                                    <SolidColorBrush Color="#f8b883"/>
+                                </chart:ChartColorModel.CustomBrushes>
+                            </chart:ChartColorModel>
+                        </chart:BarSeries.ColorModel>
+                    </chart:BarSeries>
+                </chart:SfChart>
+            </Grid>
+        </Grid>
+    </Grid>
+    
+</Page>

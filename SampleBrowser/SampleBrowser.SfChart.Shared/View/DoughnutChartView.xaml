@@ -1,0 +1,128 @@
+﻿<Page
+    x:Class="SampleBrowser.SfChart.DoughtnutChartView"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:SampleBrowser.SfChart"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d"
+    xmlns:toolkit="using:Uno.UI.Toolkit"
+     xmlns:chart="using:Syncfusion.UI.Xaml.Charts"
+    Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
+
+       <Page.DataContext>
+          <local:ViewModel/>
+        </Page.DataContext>
+    <Grid >
+        <Grid.RowDefinitions>
+            <RowDefinition />
+            <RowDefinition />
+        </Grid.RowDefinitions>
+        <Grid Margin="2">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
+            <TextBlock HorizontalAlignment="Left" VerticalAlignment="Center"
+                        FontFamily="Segoe UI"
+                       Margin="2" FontSize="18" Text="Doughnut Chart"/>
+            <Grid   BorderThickness="1" BorderBrush="LightGray" Margin="5" Grid.Row="1">
+                <chart:SfChart AreaBorderThickness="0" Margin="5,0,5,0">
+
+                    <chart:SfChart.Header>
+                        <TextBlock FontSize="14" Foreground="Black"
+                         FontFamily="Segoe UI"
+                         Margin="0,5,0,5">Mobile Usage In World</TextBlock>
+                    </chart:SfChart.Header>
+                        <chart:SfChart.Legend>
+                            <chart:ChartLegend DockPosition="Bottom" />
+                        </chart:SfChart.Legend>
+                    <chart:DoughnutSeries ConnectorType="Bezier"  ExplodeOnMouseClick="True"
+                              PieCoefficient="0.95"   Palette="Custom" ExplodeRadius="7"
+                             x:Name="pieSeries" 
+                             ItemsSource="{Binding DoughnutData}" 
+                             XBindingPath="Country" YBindingPath="Count" >
+                        <chart:DoughnutSeries.ColorModel>
+                            <chart:ChartColorModel>
+                                <chart:ChartColorModel.CustomBrushes>
+                                    <SolidColorBrush Color="#47ba9f"/>
+                                    <SolidColorBrush Color="#e58870"/>
+                                    <SolidColorBrush Color="#9686c9"/>
+                                    <SolidColorBrush Color="#e56590"/>
+                                </chart:ChartColorModel.CustomBrushes>
+                            </chart:ChartColorModel>
+                        </chart:DoughnutSeries.ColorModel>
+                        <chart:DoughnutSeries.AdornmentsInfo>
+                            <chart:ChartAdornmentInfo ShowLabel="True"  FontSize="12"  Foreground="White">
+                            </chart:ChartAdornmentInfo>
+                        </chart:DoughnutSeries.AdornmentsInfo>
+                    </chart:DoughnutSeries>
+                </chart:SfChart>
+            </Grid>
+        </Grid>
+        <Grid Margin="2" Grid.Row="1">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
+            <TextBlock HorizontalAlignment="Left" VerticalAlignment="Center"
+                        FontFamily="Segoe UI"
+                       Margin="2" FontSize="18" Text="Stacked Doughnut Chart"/>
+            <Grid   BorderThickness="1" BorderBrush="LightGray" Margin="5" Grid.Row="1">
+                <Grid Margin="5" Grid.Row="1">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="9*"/>
+                        <RowDefinition Height="1*"/>
+                    </Grid.RowDefinitions>
+
+                    <chart:SfChart AreaBorderThickness="0" Margin="5,0,5,0">
+                        <chart:SfChart.Header>
+                            <TextBlock FontSize="14" Foreground="Black"
+                         FontFamily="Segoe UI"
+                         Margin="0,5,0,5">Percentage of Loan Closure</TextBlock>
+                        </chart:SfChart.Header>
+                        
+                        <chart:DoughnutSeries ConnectorType="Bezier" 
+                                    SegmentSpacing="0.2" IsStackedDoughnut="True"
+                                    DoughnutCoefficient="1" StartAngle="-90" 
+                                              EndAngle="270"
+                                    CapStyle="BothCurve" MaximumValue="100"
+                                    ShowTooltip="True" 
+                                    ItemsSource="{Binding Collection}" Palette="Custom"
+                                    XBindingPath="Country" YBindingPath="Count">
+                            <chart:DoughnutSeries.ColorModel>
+                                <chart:ChartColorModel>
+                                    <chart:ChartColorModel.CustomBrushes>
+                                        <SolidColorBrush Color="#47ba9f"/>
+                                        <SolidColorBrush Color="#e58870"/>
+                                        <SolidColorBrush Color="#9686c9"/>
+                                        <SolidColorBrush Color="#e56590"/>
+                                    </chart:ChartColorModel.CustomBrushes>
+                                </chart:ChartColorModel>
+                            </chart:DoughnutSeries.ColorModel>
+                            <chart:DoughnutSeries.CenterView>
+                                <ContentControl  x:Name="centerView" Height="80" Width="80"
+                                                 HorizontalAlignment="Center" VerticalAlignment="Center"
+                                                 HorizontalContentAlignment="Center"
+                                                 VerticalContentAlignment="Center">
+                                    <Image Source="Person.png" />
+                                </ContentControl>
+                               
+                            </chart:DoughnutSeries.CenterView>
+                        </chart:DoughnutSeries>
+                    </chart:SfChart>
+                   <StackPanel Orientation="Horizontal" Grid.Row="1" HorizontalAlignment="Center">
+                        <Rectangle Height="15" Width="15" Fill="#47ba9f" VerticalAlignment="Center" HorizontalAlignment="Center"/>
+                        <TextBlock Text="Vehicle" Margin="5,0,0,0" VerticalAlignment="Center" HorizontalAlignment="Center"/>
+                        <Rectangle Height="15" Width="15" Fill="#e58870" Margin="10,0,0,0" VerticalAlignment="Center" HorizontalAlignment="Center"/>
+                        <TextBlock Text="Education" VerticalAlignment="Center" HorizontalAlignment="Center" Margin="5,0,0,0"/>
+                        <Rectangle Height="15" Width="15" Fill="#9686c9" Margin="10,0,0,0" VerticalAlignment="Center" HorizontalAlignment="Center"/>
+                        <TextBlock Text="Home" VerticalAlignment="Center" HorizontalAlignment="Center" Margin="5,0,0,0"/>
+                        <Rectangle Height="15" Width="15" Fill="#e56590" Margin="10,0,0,0" VerticalAlignment="Center" HorizontalAlignment="Center"/>
+                        <TextBlock Text="Personal" VerticalAlignment="Center" HorizontalAlignment="Center" Margin="5,0,0,0"/>
+                    </StackPanel>
+                </Grid>
+            </Grid>
+        </Grid>
+    </Grid>
+</Page>

@@ -1,0 +1,109 @@
+﻿<Page
+    x:Class="SampleBrowser.SfChart.PieChartView"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:SampleBrowser.SfChart"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+     xmlns:chart="using:Syncfusion.UI.Xaml.Charts"
+    mc:Ignorable="d"
+    Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
+
+        <Page.DataContext>
+          <local:ViewModel/>
+        </Page.DataContext>
+    <Grid >
+        <Grid.RowDefinitions>
+            <RowDefinition />
+            <RowDefinition />
+        </Grid.RowDefinitions>
+        <Grid Margin="2">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
+            <TextBlock HorizontalAlignment="Left" VerticalAlignment="Center"
+                        FontFamily="Segoe UI"
+                       Margin="2" FontSize="18" Text="Pie Chart"/>
+            <Grid   BorderThickness="1" BorderBrush="LightGray" Margin="5" Grid.Row="1">
+                <chart:SfChart AreaBorderThickness="0" Margin="5,0,5,0" >
+
+                    <chart:SfChart.Header>
+                        <TextBlock FontSize="14" Foreground="Black"
+                         FontFamily="Segoe UI"
+                         Margin="0,5,0,5">Internet Usage in World</TextBlock>
+                    </chart:SfChart.Header>
+                        <chart:SfChart.Legend>
+                            <chart:ChartLegend DockPosition="Bottom" />
+                        </chart:SfChart.Legend>
+                    <chart:PieSeries ConnectorType="Line" ExplodeOnMouseClick="True"
+                             PieCoefficient="0.95" ExplodeRadius="7"
+                              Palette="Custom"
+                             x:Name="pieSeries"  
+                             ItemsSource="{Binding Data}" 
+                             XBindingPath="Country" YBindingPath="Count" >
+                        <chart:PieSeries.AdornmentsInfo>
+                            <chart:ChartAdornmentInfo   ShowLabel="True"  FontSize="12" Foreground="White"  >
+                            </chart:ChartAdornmentInfo>
+                        </chart:PieSeries.AdornmentsInfo>
+                        <chart:PieSeries.ColorModel>
+                            <chart:ChartColorModel>
+                                <chart:ChartColorModel.CustomBrushes>
+                                    <SolidColorBrush Color="#47ba9f"/>
+                                    <SolidColorBrush Color="#e58870"/>
+                                    <SolidColorBrush Color="#9686c9"/>
+                                    <SolidColorBrush Color="#e56590"/>
+                                </chart:ChartColorModel.CustomBrushes>
+                            </chart:ChartColorModel>
+                        </chart:PieSeries.ColorModel>
+                    </chart:PieSeries>
+                </chart:SfChart>
+            </Grid>
+        </Grid>
+
+        <Grid Grid.Row="1" Margin="2">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
+            <TextBlock HorizontalAlignment="Left" Margin="2" FontSize="18"
+                        FontFamily="Segoe UI"
+                       Text="Semi-Pie Chart"/>
+            <Grid   BorderThickness="1" BorderBrush="LightGray" Margin="5" Grid.Row="1">
+                <chart:SfChart AreaBorderThickness="0" Margin="5,0,5,0" >
+
+                    <chart:SfChart.Header>
+                        <TextBlock FontSize="14" Foreground="Black"
+                         FontFamily="Segoe UI"
+                         Margin="0,5,0,5">Product X Growth in World</TextBlock>
+                    </chart:SfChart.Header>
+                        <chart:SfChart.Legend>
+                            <chart:ChartLegend DockPosition="Bottom" />
+                        </chart:SfChart.Legend>
+                    <chart:PieSeries ConnectorType="Line" ExplodeOnMouseClick="True" ExplodeRadius="10"
+                             PieCoefficient="1"  
+                                     StartAngle="180" EndAngle="360"
+                                     Stroke="White" StrokeThickness="1"
+                             Palette="Custom"
+                             ItemsSource="{Binding SemiPieData}" 
+                             XBindingPath="Country" YBindingPath="Count">
+                        <chart:PieSeries.AdornmentsInfo>
+                            <chart:ChartAdornmentInfo ShowLabel="True" FontSize="12" Foreground="White"  >
+                            </chart:ChartAdornmentInfo>
+                        </chart:PieSeries.AdornmentsInfo>
+                        <chart:PieSeries.ColorModel>
+                            <chart:ChartColorModel>
+                                <chart:ChartColorModel.CustomBrushes>
+                                    <SolidColorBrush Color="#47ba9f"/>
+                                    <SolidColorBrush Color="#e58870"/>
+                                    <SolidColorBrush Color="#9686c9"/>
+                                    <SolidColorBrush Color="#e56590"/>
+                                </chart:ChartColorModel.CustomBrushes>
+                            </chart:ChartColorModel>
+                        </chart:PieSeries.ColorModel>
+                    </chart:PieSeries>
+                </chart:SfChart>
+            </Grid>
+        </Grid>
+    </Grid>
+</Page>

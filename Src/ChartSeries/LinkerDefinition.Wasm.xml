@@ -1,0 +1,6 @@
+﻿<linker>
+  <assembly fullname="Syncfusion.SfChart.Uno">
+	<type fullname="Syncfusion.UI.Xaml.Charts.SfChartResourceWrapper"/>
+  </assembly>
+</linker>
+
