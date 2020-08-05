@@ -1,7 +1,7 @@
 # Syncfusion Uno Chart Control
 **SfChart** provides a perfect way to visualize data with a high level of user interactivity that focuses on development, productivity and simplicity of use. **SfChart** also provides a wide variety of charting features that are used to visualize large quantities of data, flexible data binding and user customization.
 
-<img width="700" src="../Images/SyncfusionUnoChart.gif">
+<img width="700" src="/Images/SyncfusionUnoChart.gif">
 
 ## Features
 
@@ -99,7 +99,7 @@ Then initialize an empty chart with two axes as shown below,
 ```
 The following chart is created as a result of the above codes.
 
-<img width="400" src="../Images/GettingStarted.png">
+<img width="400" src="/Images/GettingStarted.png">
 
 ## Examples Application
 
