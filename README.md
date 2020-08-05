@@ -34,7 +34,7 @@ The Uno Chart control includes functionality for plotting more than 10 chart typ
 
 ### Chart axis
 
-The Uno Chart control supports three different types of axes: numerical, categorical, and date-time. The appearance of all chart axis elements can be customized with built-in properties.
+The Uno Chart control supports three different types of axes: **numerical, categorical,** and **date-time**. The appearance of all chart axis elements can be customized with built-in properties.
 
 ### Data Labels
 
@@ -50,13 +50,13 @@ The end-user experience is greatly enhanced by a set of user interaction feature
 
 ## Getting started
 
-This section explains how to add the Uno Charts to your application and use its basic features.
+This section explains how to add the Synfusion Uno Charts to your application and use its basic features.
 
 **Step 1**
-Add Syncfusion.SfChart.Uno source project into your application solution.
+Add Syncfusion.SfChart.Uno source project to your application.
 
 **Step 2**
-Refer the source to all platforms project.
+Reference the source in the projects of all the platforms.
 
 **Step 3**
 Import the SfChart namespace as shown below in your respective Page,
@@ -98,8 +98,8 @@ The following chart is created as a result of the above codes.
 
 <img width="400" src="/Images/GettingStarted.png">
 
-## Examples Application
+## Example applications
 
-You will also find a Visual Studio solution with the Syncfusion SampleBrowser.SfChart application. It demonstrates some basic chart features. Here are outputs of the application below:
+You will also find a Visual Studio solution with the SampleBrowser.SfChart application. It demonstrates some basic chart features. Here are outputs of the application below:
 
 <img width="700" src="/Images/SyncfusionChartDemo.gif">
