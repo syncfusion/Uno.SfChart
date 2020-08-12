@@ -281,7 +281,7 @@ namespace Syncfusion.UI.Xaml.Charts
                 int width = (int)fastColumnSeries.Area.SeriesClipRect.Width;
                 int height = (int)fastColumnSeries.Area.SeriesClipRect.Height;
 
-                if (fastColumnSeries is FastColumnBitmapSeries || fastColumnSeries is FastStackingColumnBitmapSeries || fastColumnSeries is FastBarBitmapSeries || fastColumnSeries is MACDTechnicalIndicator)
+                if (fastColumnSeries is FastColumnBitmapSeries || fastColumnSeries is FastStackingColumnBitmapSeries || fastColumnSeries is FastBarBitmapSeries)
                 {
                     for (int i = 0; i < dataCount; i++)
                     {
@@ -314,17 +314,15 @@ namespace Syncfusion.UI.Xaml.Charts
                         y2 = y1ChartVals[i] > 0 ? y2Values[i] : y1Values[i];
                         if (y1 == 0 && y2 == 0)
                             continue;
-                        if (!(fastColumnSeries is MACDTechnicalIndicator))
+                        double spacing = (fastColumnSeries as ISegmentSpacing).SegmentSpacing;
+                        if (spacing > 0 && spacing <= 1)
                         {
-                            double spacing = (fastColumnSeries as ISegmentSpacing).SegmentSpacing;
-                            if (spacing > 0 && spacing <= 1)
-                            {
-                                double leftpos = (Series as ISegmentSpacing).CalculateSegmentSpacing(spacing, x2, x1);
-                                double rightpos = (Series as ISegmentSpacing).CalculateSegmentSpacing(spacing, x1, x2);
-                                x1 = (float)(leftpos);
-                                x2 = (float)(rightpos);
-                            }
+                            double leftpos = (Series as ISegmentSpacing).CalculateSegmentSpacing(spacing, x2, x1);
+                            double rightpos = (Series as ISegmentSpacing).CalculateSegmentSpacing(spacing, x1, x2);
+                            x1 = (float)(leftpos);
+                            x2 = (float)(rightpos);
                         }
+                        
 
                         if (y1 < y2)
                         {

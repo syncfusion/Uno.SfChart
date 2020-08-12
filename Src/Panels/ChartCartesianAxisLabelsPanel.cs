@@ -1246,155 +1246,65 @@ namespace Syncfusion.UI.Xaml.Charts
             bool needToRotate = (!double.IsNaN(Axis.LabelRotationAngle) && Axis.LabelRotationAngle != 0.0) || AngleForAutoRotate != 0;
             axisLineThickness = (this.Axis.axisElementsPanel as ChartCartesianAxisElementsPanel).MainAxisLine.StrokeThickness;
 
-            if (Axis.Area is SfChart3D)
+
+            int row = 0;
+            double top = 0;
+            var axis = Axis as ChartAxisBase2D;
+            isOpposed = AxisLabelLayout.IsOpposed(Axis, Axis.OpposedPosition);
+            top = isOpposed ? finalSize.Height - Margin.Bottom : Margin.Top;
+            if (axis != null && axis.LabelBorderWidth > 0)
             {
-                isOpposed = AxisLabelLayout.IsOpposed(Axis, Axis.Area.Axes.Where(x => x.Orientation == Orientation.Horizontal && x.OpposedPosition).Any());
-                var top = isOpposed && Axis.LabelsPosition == AxisElementPosition.Outside ? Axis.ArrangeRect.Bottom : Axis.ArrangeRect.Top + Top;
-                var left = Axis.ArrangeRect.Left;
-                var graphics3D = (Axis.Area as SfChart3D).Graphics3D;
-                foreach (var dictionary in RectssByRowsAndCols)
-                {
-                    foreach (var keyValue in dictionary)
-                    {
-                        var axis = Axis as ChartAxisBase3D;
-
-                        var element = Children[keyValue.Key];
-                        var actualTop = isOpposed ? top - keyValue.Value.Bottom - DesiredSizes[keyValue.Key].Height : top;
-                        var actualLeft = axis.IsManhattanAxis ? keyValue.Value.Left : keyValue.Value.Left + Axis.ActualPlotOffset;
-                        var area = Axis.Area as SfChart3D;
-
-                        var actualRotationAngle = area.ActualRotationAngle;
-                        var actualtTiltAngle = area.ActualTiltAngle;
-                        var depth = axis.AxisDepth;
-
-                        actualLeft += element.DesiredSize.Width / 2;
-
-                        if (needToRotate)
-                        {
-                            actualTop += (ComputedSizes[keyValue.Key].Height - DesiredSizes[keyValue.Key].Height) / 2;
-                            actualLeft += (ComputedSizes[keyValue.Key].Width - DesiredSizes[keyValue.Key].Width) / 2;
-                        }
-
-                        UIElementLeftShift leftElementShift = UIElementLeftShift.Default;
-                        UIElementTopShift topElementShift = UIElementTopShift.Default;
-
-                        GetLeftandShift(ref leftElementShift, ref topElementShift, isOpposed, actualRotationAngle, actualtTiltAngle);
-
-                        var leftSpacing = 0d;
-                        //To prevent the addition space in the zaxis labels placement.
-
-                        var verticalOpposed = this.Axis.Area.Axes.Any(x => x.Orientation == Orientation.Vertical && x.OpposedPosition);
-
-                        if ((axis.IsZAxis))
-                        {
-                            if (verticalOpposed)
-                                leftSpacing -= axis.TickLineSize / 2;
-                            else
-                            {
-                                if (actualRotationAngle >= 0 && actualRotationAngle < 45
-                                    || actualRotationAngle >= 135 && actualRotationAngle < 180)
-                                    leftSpacing += axis.TickLineSize / 2;
-                                else if (actualRotationAngle >= 180 && actualRotationAngle < 225
-                                    || actualRotationAngle >= 315 && actualRotationAngle < 360)
-                                    leftSpacing -= axis.TickLineSize / 2;
-                            }
-                        }
-                        else
-                        {
-                            actualLeft += left;
-
-                            if (verticalOpposed)
-                                depth -= axis.TickLineSize / 2;
-                            else
-                            {
-                                if (actualtTiltAngle >= 45 && actualtTiltAngle < 315)
-                                {
-                                    if (actualRotationAngle >= 45 && actualRotationAngle < 90
-                                        || actualRotationAngle >= 270 && actualRotationAngle < 315)
-                                        depth -= axis.TickLineSize / 2;
-                                    else if (actualRotationAngle >= 90 && actualRotationAngle < 135
-                                        || actualRotationAngle >= 225 && actualRotationAngle < 270)
-                                        depth += axis.TickLineSize / 2;
-                                }
-                            }
-                        }
-
-                        if (axis.IsZAxis)
-                            graphics3D.AddVisual(Polygon3D.CreateUIElement(new Vector3D(left + leftSpacing, actualTop, actualLeft), element, 10, 10, false, leftElementShift, topElementShift));
-                        else
-                            graphics3D.AddVisual(Polygon3D.CreateUIElement(new Vector3D(actualLeft, actualTop, depth), element, 10, 10, true, leftElementShift, topElementShift));
-                    }
-
-                    if (isOpposed)
-                    {
-                        top -= (dictionary.Values.Max(rect => rect.Height) + Margin.Bottom);
-                    }
-                    else
-                    {
-                        top += (dictionary.Values.Max(rect => rect.Height) + Margin.Top);
-                    }
-                }
+                maxHeight = RectssByRowsAndCols.Select(dictionary =>
+                 dictionary.Values.Max(rect => rect.Height)).FirstOrDefault();
+                maxHeight = RectssByRowsAndCols.Count > 1 ? maxHeight + Margin.Top :
+                  maxHeight + BorderPadding;
             }
-            else
+
+            foreach (Dictionary<int, Rect> dictionary in RectssByRowsAndCols)
             {
-                int row = 0;
-                double top = 0;
-                var axis = Axis as ChartAxisBase2D;
-                isOpposed = AxisLabelLayout.IsOpposed(Axis, Axis.OpposedPosition);
-                top = isOpposed ? finalSize.Height - Margin.Bottom : Margin.Top;
-                if (axis != null && axis.LabelBorderWidth > 0)
+                foreach (KeyValuePair<int, Rect> keyValue in dictionary)
                 {
-                    maxHeight = RectssByRowsAndCols.Select(dictionary =>
-                     dictionary.Values.Max(rect => rect.Height)).FirstOrDefault();
-                    maxHeight = RectssByRowsAndCols.Count > 1 ? maxHeight + Margin.Top :
-                      maxHeight + BorderPadding;
-                }
+                    UIElement element = Children[keyValue.Key];
+                    double actualTop = isOpposed ? top - ComputedSizes[keyValue.Key].Height : top;
 
-                foreach (Dictionary<int, Rect> dictionary in RectssByRowsAndCols)
-                {
-                    foreach (KeyValuePair<int, Rect> keyValue in dictionary)
+                    //Positioning the labels according to the axis line stroke thickness.
+                    if (Axis.TickLinesPosition == AxisElementPosition.Inside)
+                        actualTop += Axis.OpposedPosition ? -axisLineThickness : axisLineThickness;
+
+                    double actualLeft = keyValue.Value.Left + Axis.ActualPlotOffset;
+
+                    if (needToRotate)
                     {
-                        UIElement element = Children[keyValue.Key];
-                        double actualTop = isOpposed ? top - ComputedSizes[keyValue.Key].Height : top;
-
-                        //Positioning the labels according to the axis line stroke thickness.
-                        if (Axis.TickLinesPosition == AxisElementPosition.Inside)
-                            actualTop += Axis.OpposedPosition ? -axisLineThickness : axisLineThickness;
-
-                        double actualLeft = keyValue.Value.Left + Axis.ActualPlotOffset;
-
-                        if (needToRotate)
-                        {
-                            actualTop += (ComputedSizes[keyValue.Key].Height - DesiredSizes[keyValue.Key].Height) / 2;
-                            actualLeft += (ComputedSizes[keyValue.Key].Width - DesiredSizes[keyValue.Key].Width) / 2;
-                        }
-
-                        Canvas.SetLeft(element, actualLeft);
-                        Canvas.SetTop(element, actualTop);
-
-                        // Draw the Border for AxisLabels
-                        if (axis != null && axis.ShowLabelBorder && axis.LabelBorderWidth > 0)
-                        {
-                            double tickSize = (axis is CategoryAxis || axis is DateTimeCategoryAxis) ? 5 :
-                            (axis as RangeAxisBase).SmallTickLineSize;
-                            tickSize = Math.Max(tickSize, axis.TickLineSize);
-                            currentBorder = Borders[keyValue.Key];
-                            SetBorderThickness(row, dictionary, axis);
-                            SetBorderPosition(dictionary, row, axis, tickSize);
-                            SetBorderTop(row, top, tickSize);
-                            currentPos++;
-                        }
+                        actualTop += (ComputedSizes[keyValue.Key].Height - DesiredSizes[keyValue.Key].Height) / 2;
+                        actualLeft += (ComputedSizes[keyValue.Key].Width - DesiredSizes[keyValue.Key].Width) / 2;
                     }
-                    if (isOpposed)
-                        top -= (dictionary.Values.Max(rect => rect.Height) + Margin.Bottom);
-                    else
-                        top += (dictionary.Values.Max(rect => rect.Height) + Margin.Top);
-                    currentPos = 0;
 
-                    row++;
+                    Canvas.SetLeft(element, actualLeft);
+                    Canvas.SetTop(element, actualTop);
+
+                    // Draw the Border for AxisLabels
+                    if (axis != null && axis.ShowLabelBorder && axis.LabelBorderWidth > 0)
+                    {
+                        double tickSize = (axis is CategoryAxis || axis is DateTimeCategoryAxis) ? 5 :
+                        (axis as RangeAxisBase).SmallTickLineSize;
+                        tickSize = Math.Max(tickSize, axis.TickLineSize);
+                        currentBorder = Borders[keyValue.Key];
+                        SetBorderThickness(row, dictionary, axis);
+                        SetBorderPosition(dictionary, row, axis, tickSize);
+                        SetBorderTop(row, top, tickSize);
+                        currentPos++;
+                    }
                 }
-                prevEnd = 0;
+                if (isOpposed)
+                    top -= (dictionary.Values.Max(rect => rect.Height) + Margin.Bottom);
+                else
+                    top += (dictionary.Values.Max(rect => rect.Height) + Margin.Top);
+                currentPos = 0;
+
+                row++;
             }
+            prevEnd = 0;
+
         }
 
         #endregion
@@ -1464,14 +1374,8 @@ namespace Syncfusion.UI.Xaml.Charts
             {
                 double position = 0d;
 
-                var axis = Axis as ChartAxisBase3D;
                 var linearAxis = Axis as NumericalAxis;
-                if (axis != null && axis.IsManhattanAxis && (axis.RegisteredSeries[j] as ChartSeries3D).Segments != null && (axis.RegisteredSeries[j] as ChartSeries3D).Segments.Count > 0)
-                {
-                    var segment = (axis.RegisteredSeries[j] as ChartSeries3D).Segments[0] as ChartSegment3D;
-                    position = (segment.startDepth + (segment.endDepth - segment.startDepth) / 2) - (ComputedSizes[j].Width / 2);
-                }
-                else if (linearAxis != null && linearAxis.BreakExistence())
+                if (linearAxis != null && linearAxis.BreakExistence())
                 {
                     for (int i = 0; i < linearAxis.AxisRanges.Count; i++)
                     {
@@ -1755,52 +1659,27 @@ namespace Syncfusion.UI.Xaml.Charts
         {
             var verticalOpposed = this.Axis.Area.Axes.Any(x => x.Orientation == Orientation.Vertical && x.OpposedPosition);
 
-            if ((this.Axis as ChartAxisBase3D).IsZAxis)
+            if (verticalOpposed)
             {
-                if (verticalOpposed)
-                {
-                    if ((actualRotationAngle < 45 || actualRotationAngle >= 315))
-                        HorizontalLabelLayout.PositionLabelsLeft(isOpposed, ref leftElementShift, ref topElementShift, actualTiltAngle);
-                    else if ((actualRotationAngle >= 45 && actualRotationAngle < 135))
-                        HorizontalLabelLayout.PositionLabelsBack(isOpposed, ref leftElementShift, ref topElementShift, actualTiltAngle);
-                    else if ((actualRotationAngle >= 135 && actualRotationAngle < 225))
-                        HorizontalLabelLayout.PositionLabelsRight(isOpposed, ref leftElementShift, ref topElementShift, actualTiltAngle);
-                    else if ((actualRotationAngle >= 225 && actualRotationAngle < 315))
-                        HorizontalLabelLayout.PositionLabelsFront(isOpposed, ref leftElementShift, ref topElementShift, actualTiltAngle);
-                }
-                else
-                {
-                    if ((actualRotationAngle >= 0 && actualRotationAngle < 45) || (actualRotationAngle >= 180 && actualRotationAngle < 225))
-                        HorizontalLabelLayout.PositionLabelsRight(isOpposed, ref leftElementShift, ref topElementShift, actualTiltAngle);
-                    else if ((actualRotationAngle >= 45 && actualRotationAngle < 135) || (actualRotationAngle >= 225 && actualRotationAngle < 315))
-                        HorizontalLabelLayout.PositionLabelsFront(isOpposed, ref leftElementShift, ref topElementShift, actualTiltAngle);
-                    else if (actualRotationAngle >= 135 && actualRotationAngle < 180 || actualRotationAngle >= 315 && actualRotationAngle < 360)
-                        HorizontalLabelLayout.PositionLabelsLeft(isOpposed, ref leftElementShift, ref topElementShift, actualTiltAngle);
-                }
+                if ((actualRotationAngle < 45 || actualRotationAngle >= 315))
+                    HorizontalLabelLayout.PositionLabelsFront(isOpposed, ref leftElementShift, ref topElementShift, actualTiltAngle);
+                else if ((actualRotationAngle >= 45 && actualRotationAngle < 135))
+                    HorizontalLabelLayout.PositionLabelsLeft(isOpposed, ref leftElementShift, ref topElementShift, actualTiltAngle);
+                else if ((actualRotationAngle >= 135 && actualRotationAngle < 225))
+                    HorizontalLabelLayout.PositionLabelsBack(isOpposed, ref leftElementShift, ref topElementShift, actualTiltAngle);
+                else if ((actualRotationAngle >= 225 && actualRotationAngle < 315))
+                    HorizontalLabelLayout.PositionLabelsRight(isOpposed, ref leftElementShift, ref topElementShift, actualTiltAngle);
             }
             else
             {
-                if (verticalOpposed)
-                {
-                    if ((actualRotationAngle < 45 || actualRotationAngle >= 315))
-                        HorizontalLabelLayout.PositionLabelsFront(isOpposed, ref leftElementShift, ref topElementShift, actualTiltAngle);
-                    else if ((actualRotationAngle >= 45 && actualRotationAngle < 135))
-                        HorizontalLabelLayout.PositionLabelsLeft(isOpposed, ref leftElementShift, ref topElementShift, actualTiltAngle);
-                    else if ((actualRotationAngle >= 135 && actualRotationAngle < 225))
-                        HorizontalLabelLayout.PositionLabelsBack(isOpposed, ref leftElementShift, ref topElementShift, actualTiltAngle);
-                    else if ((actualRotationAngle >= 225 && actualRotationAngle < 315))
-                        HorizontalLabelLayout.PositionLabelsRight(isOpposed, ref leftElementShift, ref topElementShift, actualTiltAngle);
-                }
-                else
-                {
-                    if ((actualRotationAngle < 45 || actualRotationAngle >= 315) || (actualRotationAngle >= 135 && actualRotationAngle < 225))
-                        HorizontalLabelLayout.PositionLabelsFront(isOpposed, ref leftElementShift, ref topElementShift, actualTiltAngle);
-                    else if ((actualRotationAngle >= 45 && actualRotationAngle < 90) || (actualRotationAngle >= 225 && actualRotationAngle < 270))
-                        HorizontalLabelLayout.PositionLabelsLeft(isOpposed, ref leftElementShift, ref topElementShift, actualTiltAngle);
-                    else if ((actualRotationAngle >= 90 && actualRotationAngle < 135) || (actualRotationAngle >= 270 && actualRotationAngle < 315))
-                        HorizontalLabelLayout.PositionLabelsRight(isOpposed, ref leftElementShift, ref topElementShift, actualTiltAngle);
-                }
+                if ((actualRotationAngle < 45 || actualRotationAngle >= 315) || (actualRotationAngle >= 135 && actualRotationAngle < 225))
+                    HorizontalLabelLayout.PositionLabelsFront(isOpposed, ref leftElementShift, ref topElementShift, actualTiltAngle);
+                else if ((actualRotationAngle >= 45 && actualRotationAngle < 90) || (actualRotationAngle >= 225 && actualRotationAngle < 270))
+                    HorizontalLabelLayout.PositionLabelsLeft(isOpposed, ref leftElementShift, ref topElementShift, actualTiltAngle);
+                else if ((actualRotationAngle >= 90 && actualRotationAngle < 135) || (actualRotationAngle >= 270 && actualRotationAngle < 315))
+                    HorizontalLabelLayout.PositionLabelsRight(isOpposed, ref leftElementShift, ref topElementShift, actualTiltAngle);
             }
+            
         }
 
         #endregion
@@ -1881,264 +1760,62 @@ namespace Syncfusion.UI.Xaml.Charts
             double left = isOpposed ? Margin.Left : finalSize.Width - Margin.Right;
             axisLineThickness = (this.Axis.axisElementsPanel as ChartCartesianAxisElementsPanel).MainAxisLine.StrokeThickness;
 
-            if (Axis.Area is SfChart3D)
+            int row = 0;
+
+            var axis = Axis as ChartAxisBase2D;
+            if (axis != null && axis.LabelBorderWidth > 0)
             {
-                var axis = Axis as ChartAxisBase3D;
-                var g3 = (Axis.Area as SfChart3D).Graphics3D;
-                foreach (var dictionary in RectssByRowsAndCols)
-                {
-                    foreach (var keyValue in dictionary)
-                    {
-                        var elemSize = Size.Empty;
-                        var element = Children[keyValue.Key];
-                        var frameworkElement = element as FrameworkElement;
-                        if (element is TextBlock)
-                        {
-                            elemSize = new Size(frameworkElement.ActualWidth, frameworkElement.ActualHeight);
-                        }
-                        else
-                        {
-                            elemSize = frameworkElement.DesiredSize;
-                        }
-
-                        double depth = 0d;
-                        double actualLeft = 0d;
-                        double actualTop = 0d;
-                        var leftElementType = UIElementLeftShift.Default;
-                        actualTop = keyValue.Value.Top + Axis.ActualPlotOffset + Axis.ArrangeRect.Top;
-                        var topElementType = UIElementTopShift.TopHalfShift;
-
-                        actualTop += DesiredSizes[keyValue.Key].Height / 2;
-                        if (needToRotate)
-                            actualTop += (elemSize.Height - DesiredSizes[keyValue.Key].Height) / 2;
-
-                        if (axis.ShowAxisNextToOrigin)
-                        {
-                            var area = Axis.Area as SfChart3D;
-                            double actualRotationAngle = area.ActualRotationAngle;
-
-                            bool orgOpposed = axis.OpposedPosition || (actualRotationAngle >= 180 && actualRotationAngle < 360);
-                            orgOpposed = AxisLabelLayout.IsOpposed(axis, orgOpposed);
-                            double orgLeft = orgOpposed ? Margin.Left : finalSize.Width - Margin.Right;
-
-                            leftElementType = UIElementLeftShift.LeftHalfShift;
-                            topElementType = UIElementTopShift.TopHalfShift;
-
-                            if (actualRotationAngle >= 90 && actualRotationAngle < 270)
-                                depth = area.ActualDepth;
-
-                            actualLeft += orgOpposed ? (orgLeft + elemSize.Width / 2) : (orgLeft - elemSize.Width / 2);
-                            actualLeft += Axis.ArrangeRect.Left + Left;
-
-                            if (needToRotate)
-                                actualLeft += (elemSize.Width - DesiredSizes[keyValue.Key].Width) / 2;
-
-                            g3.AddVisual(Polygon3D.CreateUIElement(new Vector3D(actualLeft, actualTop, depth), element, 10, 10, true, leftElementType, topElementType));
-                        }
-                        else
-                        {
-                            UIElement3D uiElement3D = null;
-                            switch (axis.AxisPosition3D)
-                            {
-                                case AxisPosition3D.FrontRight:
-
-                                    // Opposed position is not checked since the FrontRight enum is set automatically when opposed position is set.
-                                    if (axis.LabelsPosition == AxisElementPosition.Inside)
-                                    {
-                                        leftElementType = UIElementLeftShift.LeftShift;
-                                        actualLeft += (finalSize.Width - Margin.Left);
-                                    }
-                                    else
-                                        actualLeft += Margin.Left;
-                                    actualLeft += Axis.ArrangeRect.Left + Left;
-                                    if (needToRotate)
-                                        actualLeft += (elemSize.Width - DesiredSizes[keyValue.Key].Width) / 2;
-                                    uiElement3D = Polygon3D.CreateUIElement(new Vector3D(actualLeft, actualTop, axis.AxisDepth), element, 10, 10, true, leftElementType, topElementType);
-                                    break;
-
-                                case AxisPosition3D.BackRight:
-                                    if (isOpposed)
-                                        actualLeft += (finalSize.Width - Margin.Left);
-                                    else
-                                    {
-                                        leftElementType = UIElementLeftShift.LeftShift;
-                                        actualLeft += Margin.Left;
-                                    }
-                                    actualLeft += Axis.ArrangeRect.Left + Left;
-                                    if (needToRotate)
-                                        actualLeft += (elemSize.Width - DesiredSizes[keyValue.Key].Width) / 2;
-                                    uiElement3D = Polygon3D.CreateUIElement(new Vector3D(actualLeft, actualTop, axis.AxisDepth), element, 10, 10, true, leftElementType, topElementType);
-                                    break;
-
-                                case AxisPosition3D.BackLeft:
-                                    if (isOpposed)
-                                    {
-                                        leftElementType = UIElementLeftShift.LeftShift;
-                                        actualLeft += left;
-                                    }
-                                    else
-                                    {
-                                        actualLeft += DesiredSizes[keyValue.Key].Width;
-                                        actualLeft += (finalSize.Width - elemSize.Width - Margin.Left);
-                                    }
-                                    actualLeft += Axis.ArrangeRect.Left + Left;
-                                    if (needToRotate)
-                                        actualLeft += (elemSize.Width - DesiredSizes[keyValue.Key].Width) / 2;
-                                    uiElement3D = Polygon3D.CreateUIElement(new Vector3D(actualLeft, actualTop, axis.AxisDepth), element, 10, 10, true, leftElementType, topElementType);
-                                    break;
-
-                                case AxisPosition3D.DepthBackRight:
-                                    if (isOpposed)
-                                    {
-                                        leftElementType = UIElementLeftShift.LeftShift;
-                                        depth += (axis.AxisDepth + Left + finalSize.Width - Margin.Left);
-                                    }
-                                    else
-                                        depth += axis.AxisDepth + Left + Margin.Left;
-
-                                    actualLeft += this.Axis.ArrangeRect.Left;
-                                    if (needToRotate)
-                                        depth += (elemSize.Width - DesiredSizes[keyValue.Key].Width) / 2;
-                                    uiElement3D = Polygon3D.CreateUIElement(new Vector3D(actualLeft, actualTop, depth), element, 10, 10, false, leftElementType, topElementType);
-                                    break;
-
-                                case AxisPosition3D.DepthFrontLeft:
-
-                                    if (isOpposed)
-                                    {
-                                        leftElementType = UIElementLeftShift.LeftShift;
-                                        depth += (axis.AxisDepth + Left + Margin.Left);
-                                    }
-                                    else
-                                        depth += (axis.AxisDepth + finalSize.Width + Left - Margin.Left);
-
-                                    actualLeft += this.Axis.ArrangeRect.Left;
-                                    if (needToRotate)
-                                        depth += (elemSize.Width - DesiredSizes[keyValue.Key].Width) / 2;
-                                    uiElement3D = Polygon3D.CreateUIElement(new Vector3D(actualLeft, actualTop, depth), element, 10, 10, false, leftElementType, topElementType);
-                                    break;
-
-                                case AxisPosition3D.DepthFrontRight:
-                                    if (isOpposed)
-                                    {
-                                        leftElementType = UIElementLeftShift.RightHalfShift;
-                                        depth += axis.AxisDepth + Margin.Left - elemSize.Width - finalSize.Width;
-                                    }
-                                    else
-                                    {
-                                        leftElementType = UIElementLeftShift.LeftShift;
-                                        depth += (axis.AxisDepth - Left - Margin.Left);
-                                    }
-                                    actualLeft += axis.ArrangeRect.Left;
-                                    if (needToRotate)
-                                        depth += (elemSize.Width - DesiredSizes[keyValue.Key].Width) / 2;
-                                    uiElement3D = Polygon3D.CreateUIElement(new Vector3D(actualLeft, actualTop, depth), element, 10, 10, false, leftElementType, topElementType);
-                                    break;
-
-                                case AxisPosition3D.DepthBackLeft:
-                                    if (isOpposed)
-                                    {
-                                        depth += axis.AxisDepth - Left - Margin.Left;
-                                    }
-                                    else
-                                    {
-                                        leftElementType = UIElementLeftShift.LeftShift;
-                                        depth = axis.AxisDepth - Left - left;
-                                    }
-                                    actualLeft += axis.ArrangeRect.Left;
-                                    if (needToRotate)
-                                        depth += (elemSize.Width - DesiredSizes[keyValue.Key].Width) / 2;
-                                    uiElement3D = Polygon3D.CreateUIElement(new Vector3D(actualLeft, actualTop, depth), element, 10, 10, false, leftElementType, topElementType);
-                                    break;
-
-                                default:
-                                    if (isOpposed)
-                                        actualLeft += left;
-                                    else
-                                    {
-                                        leftElementType = UIElementLeftShift.LeftShift;
-                                        actualLeft += left;
-                                    }
-
-                                    actualLeft += Axis.ArrangeRect.Left + Left;
-                                    if (needToRotate)
-                                        actualLeft += (elemSize.Width - DesiredSizes[keyValue.Key].Width) / 2;
-                                    uiElement3D = Polygon3D.CreateUIElement(new Vector3D(actualLeft, actualTop, axis.AxisDepth), element, 10, 10, true, leftElementType, topElementType);
-                                    break;
-                            }
-
-                            g3.AddVisual(uiElement3D);
-                        }
-                    }
-
-                    if (isOpposed)
-                    {
-                        left += (dictionary.Values.Max(rect => rect.Width) + Margin.Left);
-                    }
-                    else
-                    {
-                        left -= (dictionary.Values.Max(rect => rect.Width) + Margin.Right);
-                    }
-                }
+                maxWidth = RectssByRowsAndCols.Select(dictionary => dictionary.Values.Max(rect => rect.Width)).FirstOrDefault();
+                maxWidth = RectssByRowsAndCols.Count > 1 ? maxWidth : maxWidth + BorderPadding;
             }
-            else
+
+            foreach (Dictionary<int, Rect> dictionary in RectssByRowsAndCols)
             {
-                int row = 0;
-
-                var axis = Axis as ChartAxisBase2D;
-                if (axis != null && axis.LabelBorderWidth > 0)
+                foreach (KeyValuePair<int, Rect> keyValue in dictionary)
                 {
-                    maxWidth = RectssByRowsAndCols.Select(dictionary => dictionary.Values.Max(rect => rect.Width)).FirstOrDefault();
-                    maxWidth = RectssByRowsAndCols.Count > 1 ? maxWidth : maxWidth + BorderPadding;
-                }
+                    UIElement element = Children[keyValue.Key];
 
-                foreach (Dictionary<int, Rect> dictionary in RectssByRowsAndCols)
-                {
-                    foreach (KeyValuePair<int, Rect> keyValue in dictionary)
+                    double actualLeft = isOpposed ? left : left - ComputedSizes[keyValue.Key].Width;
+
+                    // Positioning the labels according to the axis line stroke thickness.
+                    if (Axis.TickLinesPosition == AxisElementPosition.Inside)
+                        actualLeft += Axis.OpposedPosition ? axisLineThickness : -axisLineThickness;
+
+                    double actualTop = keyValue.Value.Top + Axis.ActualPlotOffset;
+
+                    if (needToRotate)
                     {
-                        UIElement element = Children[keyValue.Key];
-
-                        double actualLeft = isOpposed ? left : left - ComputedSizes[keyValue.Key].Width;
-
-                        // Positioning the labels according to the axis line stroke thickness.
-                        if (Axis.TickLinesPosition == AxisElementPosition.Inside)
-                            actualLeft += Axis.OpposedPosition ? axisLineThickness : -axisLineThickness;
-
-                        double actualTop = keyValue.Value.Top + Axis.ActualPlotOffset;
-
-                        if (needToRotate)
-                        {
-                            actualLeft += (ComputedSizes[keyValue.Key].Width - DesiredSizes[keyValue.Key].Width) / 2;
-                            actualTop += (ComputedSizes[keyValue.Key].Height - DesiredSizes[keyValue.Key].Height) / 2;
-                        }
-
-                        Canvas.SetLeft(element, actualLeft);
-                        Canvas.SetTop(element, actualTop);
-
-                        //To draw the border for axis label
-                        if (axis != null && axis.ShowLabelBorder && axis.LabelBorderWidth > 0)
-                        {
-                            double tickSize = (axis is CategoryAxis || axis is DateTimeCategoryAxis) ? 5 :
-                            (axis as RangeAxisBase).SmallTickLineSize;
-                            tickSize = Math.Max(tickSize, axis.TickLineSize);
-                            currentBorder = Borders[keyValue.Key];
-                            SetBorderThickness(row, dictionary, axis);
-                            SetBorderPosition(dictionary, row, axis, tickSize);
-                            SetBorderLeft(row, left, tickSize);
-                            currentPos++;
-                        }
+                        actualLeft += (ComputedSizes[keyValue.Key].Width - DesiredSizes[keyValue.Key].Width) / 2;
+                        actualTop += (ComputedSizes[keyValue.Key].Height - DesiredSizes[keyValue.Key].Height) / 2;
                     }
 
-                    if (isOpposed)
-                        left += (dictionary.Values.Max(rect => rect.Width) + Margin.Left);
-                    else
-                        left -= (dictionary.Values.Max(rect => rect.Width) + Margin.Right);
-                    currentPos = 0;
-                    row++;
+                    Canvas.SetLeft(element, actualLeft);
+                    Canvas.SetTop(element, actualTop);
+
+                    //To draw the border for axis label
+                    if (axis != null && axis.ShowLabelBorder && axis.LabelBorderWidth > 0)
+                    {
+                        double tickSize = (axis is CategoryAxis || axis is DateTimeCategoryAxis) ? 5 :
+                        (axis as RangeAxisBase).SmallTickLineSize;
+                        tickSize = Math.Max(tickSize, axis.TickLineSize);
+                        currentBorder = Borders[keyValue.Key];
+                        SetBorderThickness(row, dictionary, axis);
+                        SetBorderPosition(dictionary, row, axis, tickSize);
+                        SetBorderLeft(row, left, tickSize);
+                        currentPos++;
+                    }
                 }
 
-                prevEnd = 0;
+                if (isOpposed)
+                    left += (dictionary.Values.Max(rect => rect.Width) + Margin.Left);
+                else
+                    left -= (dictionary.Values.Max(rect => rect.Width) + Margin.Right);
+                currentPos = 0;
+                row++;
             }
+
+            prevEnd = 0;
+
         }
 
         #endregion

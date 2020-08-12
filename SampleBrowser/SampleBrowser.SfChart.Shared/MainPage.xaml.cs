@@ -71,6 +71,9 @@ namespace SampleBrowser.SfChart
                 case "Bubble":
                     contentFrame.Navigate(typeof(BubbleChartView));
                     break;
+                case "Axis":
+                    contentFrame.Navigate(typeof(ChartAxisType));
+                    break;
             }
         }
 

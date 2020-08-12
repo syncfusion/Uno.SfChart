@@ -504,15 +504,14 @@ namespace Syncfusion.UI.Xaml.Charts
             //It must bind with the properties of the segment.
             if ((this is ScatterSegment && this.Series is BoxAndWhiskerSeries)) return;
 
-            var isGrouping = (Series.ActualXAxis is CategoryAxis) ? (Series.ActualXAxis as CategoryAxis).IsIndexed :
-           (Series.ActualXAxis is CategoryAxis3D) ? (Series.ActualXAxis as CategoryAxis3D).IsIndexed : true;
+            var isGrouping = (Series.ActualXAxis is CategoryAxis) ? (Series.ActualXAxis as CategoryAxis).IsIndexed :true;
             if (Series.ActualArea.GetEnableSeriesSelection() && Series.ActualArea.SelectedSeriesCollection.Contains(Series))
             {
                 Binding binding = new Binding();
                 binding.Source = Series;
                 binding.Path = new PropertyPath("SeriesSelectionBrush");
                 binding.Converter = new SeriesSelectionBrushConverter(Series);
-                binding.ConverterParameter = ((Series is AccumulationSeriesBase) || (Series is CircularSeriesBase3D)) && !isGroupTo ? Series.ActualData.IndexOf(Item) : Series.Segments.IndexOf(this);
+                binding.ConverterParameter = ((Series is AccumulationSeriesBase)) && !isGroupTo ? Series.ActualData.IndexOf(Item) : Series.Segments.IndexOf(this);
                 BindingOperations.SetBinding(this, ChartSegment.InteriorProperty, binding);
 
             }
@@ -525,7 +524,7 @@ namespace Syncfusion.UI.Xaml.Charts
                 if (!isGrouping && (Series.IsSideBySide && (!(Series is RangeSeriesBase)) && (!(Series is FinancialSeriesBase)) && !(Series is WaterfallSeries)))
                     binding.ConverterParameter = Series.GroupedActualData.IndexOf(Item);
                 else
-                    binding.ConverterParameter = ((Series is AccumulationSeriesBase) || (Series is CircularSeriesBase3D)) && !isGroupTo ? Series.ActualData.IndexOf(Item) : Series.Segments.IndexOf(this);
+                    binding.ConverterParameter = ((Series is AccumulationSeriesBase)) && !isGroupTo ? Series.ActualData.IndexOf(Item) : Series.Segments.IndexOf(this);
                 BindingOperations.SetBinding(this, ChartSegment.InteriorProperty, binding);
             }
             else if (this is WaterfallSegment)
@@ -539,8 +538,8 @@ namespace Syncfusion.UI.Xaml.Charts
                 if (!isGrouping && (Series.IsSideBySide && (!(Series is RangeSeriesBase)) && (!(Series is FinancialSeriesBase))))
                     binding.ConverterParameter = Series.GroupedActualData.IndexOf(Item);
                 else
-                    binding.ConverterParameter = ((Series is AccumulationSeriesBase) || (Series is CircularSeriesBase3D)) && !isGroupTo ?
-                    Series.ActualData.IndexOf(Item) : (Series is ChartSeries3D && Series is ColumnSeries3D) ? Series.ActualData.IndexOf(Item) : Series.Segments.IndexOf(this);
+                    binding.ConverterParameter = ((Series is AccumulationSeriesBase)) && !isGroupTo ?
+                    Series.ActualData.IndexOf(Item) : Series.Segments.IndexOf(this);
                 BindingOperations.SetBinding(this, ChartSegment.InteriorProperty, binding);
             }
             else
@@ -559,7 +558,7 @@ namespace Syncfusion.UI.Xaml.Charts
                 binding.Path = new PropertyPath("Stroke");
                 BindingOperations.SetBinding(this, ChartSegment.StrokeProperty, binding);
             }
-            if (Series is ChartSeries || Series is LineSeries3D)
+            if (Series is ChartSeries)
             {
                 Binding binding2 = new Binding();
                 binding2.Source = Series;
@@ -615,8 +614,7 @@ namespace Syncfusion.UI.Xaml.Charts
         internal bool IsSegmentSelected()
         {
             int index = -1;
-            var isGrouping = (Series.ActualXAxis is CategoryAxis) ? (Series.ActualXAxis as CategoryAxis).IsIndexed :
-              (Series.ActualXAxis is CategoryAxis3D) ? (Series.ActualXAxis as CategoryAxis3D).IsIndexed : true;
+            var isGrouping = (Series.ActualXAxis is CategoryAxis) ? (Series.ActualXAxis as CategoryAxis).IsIndexed : true;
             if (Series is CircularSeriesBase && !double.IsNaN(((CircularSeriesBase)Series).GroupTo))
                 index = Series.Segments.IndexOf(this);
             else if (!isGrouping && (Series.IsSideBySide && (!(Series is RangeSeriesBase)) && (!(Series is FinancialSeriesBase))
@@ -627,10 +625,7 @@ namespace Syncfusion.UI.Xaml.Charts
 
             return ((Series is ISegmentSelectable && !Series.IsBitmapSeries
                 && Series.SelectedSegmentsIndexes.Contains(index) &&
-                (Series.IsSideBySide || Series is AccumulationSeriesBase || Series is BubbleSeries || Series is ScatterSeries)) ||
-                (Series is ChartSeries3D && (Series as ChartSeries3D).SegmentSelectionBrush != null
-                && Series.SelectedSegmentsIndexes.Contains(index) &&
-                (Series.IsSideBySide || Series is CircularSeriesBase3D)));
+                (Series.IsSideBySide || Series is AccumulationSeriesBase || Series is BubbleSeries || Series is ScatterSeries)));
         }
 
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Performance", "CA1800:DoNotCastUnnecessarily")]
@@ -810,55 +805,5 @@ namespace Syncfusion.UI.Xaml.Charts
         #endregion
     }
 
-    /// <summary>
-    /// An abstract base class for 3D type of chart segments.
-    /// </summary>
-    public abstract partial class ChartSegment3D : ChartSegment
-    {
-        #region Fields
-
-        #region Internal Fields
-
-        internal List<Polygon3D> Polygons = new List<Polygon3D>();
-
-        #endregion
-
-        #region Protected Internal Fields
-
-        protected internal double startDepth, endDepth;
-
-        #endregion
-
-        #endregion
-
-        #region Properties
-
-        #region Public Properties
-
-        /// <summary>
-        /// Gets or sets the z-value range for the segment.
-        /// </summary>
-        public DoubleRange ZRange
-
-        { get; set; }
-
-        #endregion
-
-        #endregion
-
-        #region Methods
-
-        #region Internal Override Methods
-
-        internal override UIElement CreateSegmentVisual(Size size)
-        {
-            if ((Series as ChartSeries3D).PrevSelectedIndex != Series.Segments.IndexOf(this))
-                BindProperties();
-            return CreateVisual(size);
-        }
-
-        #endregion
-
-        #endregion
-    }
+    
 }

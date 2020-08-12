@@ -277,169 +277,57 @@ namespace Syncfusion.UI.Xaml.Charts
             double innerPadding = 0;
             double axisHeight = 0, top = 0;
 
-            if (axis.Count > 0 && axis[0] is ChartAxisBase3D)
+            foreach (ChartAxis content in axis)
             {
-                //IsOppesed is used when anyone of the 3D Charts axis is opposed.
-                var isOpposed = false;
-
-                foreach (ChartAxis content in axis)
+                if (content != null)
                 {
-                    if (content != null)
+
+                    if (content.Area != null)
                     {
-                        isOpposed = content.OpposedPosition;
+                        CalcRowSpanAxisWidthandTop(top, content.Area.GetActualRowSpan(content), size.Height, content, out top, out axisHeight);
+                        if (content.Area.GetActualRow(content) == content.Area.RowDefinitions.IndexOf(this))
+                            content.ComputeDesiredSize(new Size(size.Width, axisHeight));
+                    }
 
-                        if (content.Area != null)
+                    if (content.ShowAxisNextToOrigin && content.Area != null &&
+                        content.Area.ColumnDefinitions.Count <= 1)
+                    {
+                        bool isContinue = false;
+                        MeasureRectBasedOnOrigin(content, nearSizes, farSizes, ref isContinue, isFirstLayout);
+                        if (isContinue)
+                            continue;
+                    }
+                    if (content.OpposedPosition)
+                    {
+                        innerPadding = isOpposedFirstElement ? content.InsidePadding : 0;
+                        if (farSizes.Count <= farIndex)
                         {
-                            CalcRowSpanAxisWidthandTop(top, content.Area.GetActualRowSpan(content), size.Height, content, out top, out axisHeight);
-                            if (content.Area.GetActualRow(content) == content.Area.RowDefinitions.IndexOf(this))
-                                content.ComputeDesiredSize(new Size(size.Width, axisHeight));
+                            farSizes.Add(content.ComputedDesiredSize.Width - innerPadding);
                         }
-
-                        if (content.ShowAxisNextToOrigin && content.Area != null &&
-                            content.Area.ColumnDefinitions.Count <= 1)
+                        else if (farSizes[farIndex] < (content.ComputedDesiredSize.Width - innerPadding))
                         {
-                            bool isContinue = false;
-                            MeasureRectBasedOnOrigin(content, nearSizes, farSizes, ref isContinue, isFirstLayout);
-                            if (isContinue)
-                                continue;
+                            farSizes[farIndex] = content.ComputedDesiredSize.Width - innerPadding;
                         }
-
-                        var area3D = content.Area as SfChart3D;
-                        var axis3D = content as ChartAxisBase3D;
-
-                        //The position for the 3D axis is fixed.
-                        if (!content.OpposedPosition)
+                        farIndex++;
+                        isOpposedFirstElement = false;
+                    }
+                    else
+                    {
+                        innerPadding = isFirstElement ? content.InsidePadding : 0;
+                        if (nearSizes.Count <= nearIndex)
                         {
-                            var tempangle = area3D.Rotation % 360;
-                            var actualRotationAngle = area3D.ActualRotationAngle = (tempangle < 0 ? tempangle + 360 : tempangle);
-
-                            if (actualRotationAngle >= 45 && actualRotationAngle < 90)
-                            {
-                                isOpposed = true;
-                                axis3D.AxisPosition3D = AxisPosition3D.DepthBackRight;
-                            }
-                            else if (actualRotationAngle >= 90 && actualRotationAngle < 135)
-                            {
-                                isOpposed = true;
-                                axis3D.AxisPosition3D = AxisPosition3D.DepthFrontRight;
-                            }
-                            else if (actualRotationAngle >= 135 && actualRotationAngle < 180)
-                            {
-                                axis3D.AxisPosition3D = AxisPosition3D.BackLeft;
-                            }
-                            else if (actualRotationAngle >= 180 && actualRotationAngle < 225)
-                            {
-                                isOpposed = true;
-                                axis3D.AxisPosition3D = AxisPosition3D.BackRight;
-                            }
-                            else if (actualRotationAngle >= 225 && actualRotationAngle < 270)
-                            {
-                                axis3D.AxisPosition3D = AxisPosition3D.DepthFrontLeft;
-                            }
-                            else if (actualRotationAngle >= 270 && actualRotationAngle < 315)
-                            {
-                                axis3D.AxisPosition3D = AxisPosition3D.DepthBackLeft;
-                            }
-                            else if (actualRotationAngle >= 315 && actualRotationAngle < 360)
-                            {
-                                isOpposed = true;
-                                axis3D.AxisPosition3D = AxisPosition3D.FrontRight;
-                            }
-                            else
-                            {
-                                axis3D.AxisPosition3D = AxisPosition3D.FrontLeft;
-                            }
+                            nearSizes.Add(content.ComputedDesiredSize.Width - innerPadding);
                         }
-                        else
+                        else if (nearSizes[nearIndex] < (content.ComputedDesiredSize.Width - innerPadding))
                         {
-                            isOpposed = true;
-                            axis3D.AxisPosition3D = AxisPosition3D.FrontRight;
+                            nearSizes[nearIndex] = content.ComputedDesiredSize.Width - innerPadding;
                         }
-
-                        if (isOpposed)
-                        {
-                            innerPadding = isOpposedFirstElement ? content.InsidePadding : 0;
-                            if (farSizes.Count <= farIndex)
-                            {
-                                farSizes.Add(content.ComputedDesiredSize.Width - innerPadding);
-                            }
-                            else if (farSizes[farIndex] < (content.ComputedDesiredSize.Width - innerPadding))
-                            {
-                                farSizes[farIndex] = content.ComputedDesiredSize.Width - innerPadding;
-                            }
-                            farIndex++;
-                            isOpposedFirstElement = false;
-                        }
-                        else
-                        {
-                            innerPadding = isFirstElement ? content.InsidePadding : 0;
-                            if (nearSizes.Count <= nearIndex)
-                            {
-                                nearSizes.Add(content.ComputedDesiredSize.Width - innerPadding);
-                            }
-                            else if (nearSizes[nearIndex] < (content.ComputedDesiredSize.Width - innerPadding))
-                            {
-                                nearSizes[nearIndex] = content.ComputedDesiredSize.Width - innerPadding;
-                            }
-                            nearIndex++;
-                            isFirstElement = false;
-                        }
+                        nearIndex++;
+                        isFirstElement = false;
                     }
                 }
             }
-            else
-            {
-                foreach (ChartAxis content in axis)
-                {
-                    if (content != null)
-                    {
-
-                        if (content.Area != null)
-                        {
-                            CalcRowSpanAxisWidthandTop(top, content.Area.GetActualRowSpan(content), size.Height, content, out top, out axisHeight);
-                            if (content.Area.GetActualRow(content) == content.Area.RowDefinitions.IndexOf(this))
-                                content.ComputeDesiredSize(new Size(size.Width, axisHeight));
-                        }
-
-                        if (content.ShowAxisNextToOrigin && content.Area != null &&
-                            content.Area.ColumnDefinitions.Count <= 1)
-                        {
-                            bool isContinue = false;
-                            MeasureRectBasedOnOrigin(content, nearSizes, farSizes, ref isContinue, isFirstLayout);
-                            if (isContinue)
-                                continue;
-                        }
-                        if (content.OpposedPosition)
-                        {
-                            innerPadding = isOpposedFirstElement ? content.InsidePadding : 0;
-                            if (farSizes.Count <= farIndex)
-                            {
-                                farSizes.Add(content.ComputedDesiredSize.Width - innerPadding);
-                            }
-                            else if (farSizes[farIndex] < (content.ComputedDesiredSize.Width - innerPadding))
-                            {
-                                farSizes[farIndex] = content.ComputedDesiredSize.Width - innerPadding;
-                            }
-                            farIndex++;
-                            isOpposedFirstElement = false;
-                        }
-                        else
-                        {
-                            innerPadding = isFirstElement ? content.InsidePadding : 0;
-                            if (nearSizes.Count <= nearIndex)
-                            {
-                                nearSizes.Add(content.ComputedDesiredSize.Width - innerPadding);
-                            }
-                            else if (nearSizes[nearIndex] < (content.ComputedDesiredSize.Width - innerPadding))
-                            {
-                                nearSizes[nearIndex] = content.ComputedDesiredSize.Width - innerPadding;
-                            }
-                            nearIndex++;
-                            isFirstElement = false;
-                        }
-                    }
-                }
-            }
+            
         }
 
         internal void UpdateLegendArrangeRect(double top, double height, double areaWidth, List<double> nearSizes, List<double> farSizes)
@@ -497,163 +385,66 @@ namespace Syncfusion.UI.Xaml.Charts
             double axisTop = 0;
             int actualRowIndex = 0, elementRowIndex = 0;
 
-            if (axis.Count > 0 && axis[0] is ChartAxisBase3D)
+            for (int i = 0; i < Axis.Count; i++)
             {
-                for (int i = 0; i < Axis.Count; i++)
+                ChartAxis element = Axis[i];
+                if (element != null)
                 {
-                    ChartAxis element = Axis[i];
-                    if (element != null)
+                    //Set RowSpan height and top value
+                    if (element.Area != null)
                     {
-                        //Set RowSpan height and top value
-                        if (element.Area != null)
+                        elementRowIndex = element.Area.GetActualRow(element);
+                        actualRowIndex = element.Area.RowDefinitions.IndexOf(this);
+                        CalcRowSpanAxisWidthandTop(top, element.Area.GetActualRowSpan(element), height, element, out axisTop, out axisHeight);
+                    }
+
+                    Size desiredSize = element.ComputedDesiredSize;
+                    try
+                    {
+                        if (element.ShowAxisNextToOrigin && element.Area != null &&
+                            element.Area.ColumnDefinitions.Count <= 1)
                         {
-                            elementRowIndex = element.Area.GetActualRow(element);
-                            actualRowIndex = element.Area.RowDefinitions.IndexOf(this);
-                            CalcRowSpanAxisWidthandTop(top, element.Area.GetActualRowSpan(element), height, element, out axisTop, out axisHeight);
+                            bool isContinue = false;
+                            ArragneRectBasedOnOrigin(element, elementRowIndex, actualRowIndex, axisTop, areaWidth, axisHeight, ref isContinue);
+                            if (isContinue)
+                                continue;
                         }
 
-                        Size desiredSize = element.ComputedDesiredSize;
-                        try
+                        if (element.OpposedPosition)
                         {
-                            var area3D = element.Area as SfChart3D;
-
-                            //IsOppesed is used when anyone of the 3D Charts axis is opposed.                                                      
-                            var axis3D = element as ChartAxisBase3D;
-                            axis3D.AxisDepth = 0;
-
-                            var actualRotationAngle = area3D.ActualRotationAngle;
-                            var isOpposed = (element.OpposedPosition
-                                         || (element.ShowAxisNextToOrigin
-                                         && ((actualRotationAngle >= 180 && actualRotationAngle < 360))));
-
-                            if (element.ShowAxisNextToOrigin && element.Area != null &&
-                                element.Area.ColumnDefinitions.Count <= 1)
-                            {
-                                bool isContinue = false;
-                                ArragneRectBasedOnOrigin(element, elementRowIndex, actualRowIndex, axisTop, areaWidth, axisHeight, ref isContinue);
-                                if (isContinue)
-                                    continue;
-                            }
-
-                            axis3D.AxisDepth = 0;
-
+                            innerPadding = isOpposedFirstElement ? element.InsidePadding : 0;
                             if (elementRowIndex == actualRowIndex)
-                            {
-                                double actualleft = 0d;
-                                switch (axis3D.AxisPosition3D)
-                                {
-                                    case AxisPosition3D.DepthBackRight:
-                                        //The element padding is subtracted since the whole chart area is extended.
-                                        axis3D.AxisDepth = (area3D.ActualDepth) - element.InsidePadding;
-                                        actualleft = areaWidth - farTotalSize;
-                                        break;
-
-                                    case AxisPosition3D.DepthFrontRight:
-                                        //The element padding is added since the whole chart area is extended.
-                                        axis3D.AxisDepth = element.InsidePadding;
-                                        actualleft = areaWidth - farTotalSize + 1;
-                                        break;
-
-                                    case AxisPosition3D.BackLeft:
-                                        axis3D.AxisDepth = area3D.ActualDepth + 1;
-                                        actualleft = 0;
-                                        break;
-
-                                    case AxisPosition3D.BackRight:
-                                        axis3D.AxisDepth = area3D.ActualDepth + 1;
-                                        actualleft = (areaWidth - desiredSize.Width);
-                                        break;
-
-                                    case AxisPosition3D.DepthFrontLeft:
-                                        axis3D.AxisDepth = -desiredSize.Width + element.InsidePadding;
-                                        actualleft = nearTotalSize - 1;
-                                        break;
-
-                                    case AxisPosition3D.DepthBackLeft:
-                                        axis3D.AxisDepth = area3D.ActualDepth + desiredSize.Width - element.InsidePadding;
-                                        actualleft = nearTotalSize - 1;
-                                        break;
-
-                                    case AxisPosition3D.FrontRight:
-                                        actualleft = (areaWidth - farTotalSize) - element.InsidePadding;
-                                        break;
-
-                                    default:
-                                        actualleft = isOpposed ? actualleft = (areaWidth - farTotalSize) - element.InsidePadding : (nearTotalSize - desiredSize.Width) + element.InsidePadding;
-                                        break;
-                                }
-                                element.ArrangeRect = new Rect(actualleft, axisTop, desiredSize.Width, axisHeight);
-                                element.Measure(new Size(element.ArrangeRect.Width, element.ArrangeRect.Height));
-                            }
+                                element.ArrangeRect = new Rect(
+                                    (areaWidth - farTotalSize) - innerPadding,
+                                    axisTop,
+                                    desiredSize.Width,
+                                    axisHeight);
+                            element.Measure(new Size(element.ArrangeRect.Width, element.ArrangeRect.Height));
+                            farTotalSize -= farSizes[farIndex];
+                            farIndex++;
+                            isOpposedFirstElement = false;
                         }
-                        catch (Exception)
+                        else
                         {
+                            innerPadding = isFirstElement ? element.InsidePadding : 0;
+                            if (elementRowIndex == actualRowIndex)
+                                element.ArrangeRect = new Rect(
+                                    (nearTotalSize - desiredSize.Width) + innerPadding,
+                                    axisTop,
+                                    desiredSize.Width,
+                                    axisHeight);
+                            element.Measure(new Size(element.ArrangeRect.Width, element.ArrangeRect.Height));
+                            nearTotalSize -= nearSizes[nearIndex];
+                            nearIndex++;
+                            isFirstElement = false;
                         }
                     }
-                }
-            }
-            else
-            {
-                for (int i = 0; i < Axis.Count; i++)
-                {
-                    ChartAxis element = Axis[i];
-                    if (element != null)
+                    catch (Exception)
                     {
-                        //Set RowSpan height and top value
-                        if (element.Area != null)
-                        {
-                            elementRowIndex = element.Area.GetActualRow(element);
-                            actualRowIndex = element.Area.RowDefinitions.IndexOf(this);
-                            CalcRowSpanAxisWidthandTop(top, element.Area.GetActualRowSpan(element), height, element, out axisTop, out axisHeight);
-                        }
-
-                        Size desiredSize = element.ComputedDesiredSize;
-                        try
-                        {
-                            if (element.ShowAxisNextToOrigin && element.Area != null &&
-                                element.Area.ColumnDefinitions.Count <= 1)
-                            {
-                                bool isContinue = false;
-                                ArragneRectBasedOnOrigin(element, elementRowIndex, actualRowIndex, axisTop, areaWidth, axisHeight, ref isContinue);
-                                if (isContinue)
-                                    continue;
-                            }
-
-                            if (element.OpposedPosition)
-                            {
-                                innerPadding = isOpposedFirstElement ? element.InsidePadding : 0;
-                                if (elementRowIndex == actualRowIndex)
-                                    element.ArrangeRect = new Rect(
-                                        (areaWidth - farTotalSize) - innerPadding, 
-                                        axisTop,
-                                        desiredSize.Width,
-                                        axisHeight);
-                                element.Measure(new Size(element.ArrangeRect.Width, element.ArrangeRect.Height));
-                                farTotalSize -= farSizes[farIndex];
-                                farIndex++;
-                                isOpposedFirstElement = false;
-                            }
-                            else
-                            {
-                                innerPadding = isFirstElement ? element.InsidePadding : 0;
-                                if (elementRowIndex == actualRowIndex)
-                                    element.ArrangeRect = new Rect(
-                                        (nearTotalSize - desiredSize.Width) + innerPadding,
-                                        axisTop,
-                                        desiredSize.Width,
-                                        axisHeight);
-                                element.Measure(new Size(element.ArrangeRect.Width, element.ArrangeRect.Height));
-                                nearTotalSize -= nearSizes[nearIndex];
-                                nearIndex++;
-                                isFirstElement = false;
-                            }
-                        }
-                        catch (Exception)
-                        {
-                        }
                     }
                 }
             }
+            
         }
 
         internal void Arrange()
@@ -721,8 +512,7 @@ namespace Syncfusion.UI.Xaml.Charts
             {
                 if (content.HeaderPosition == AxisHeaderPosition.Far)
                 {
-                    var area3D = content.Area as SfChart3D;
-                    var isOpposed = (area3D != null && area3D.ActualRotationAngle >= 180 && area3D.ActualRotationAngle < 360) ? true : content.OpposedPosition;
+                    var isOpposed = content.OpposedPosition;
                     double position = isOpposed ? (1 - value) * (content.Area.SeriesClipRect.Width - (chartAxis.ActualPlotOffset * 2)) + chartAxis.ActualPlotOffset + content.InsidePadding :
                     value * (content.Area.SeriesClipRect.Width - (chartAxis.ActualPlotOffset * 2)) + chartAxis.ActualPlotOffset + content.InsidePadding;
                     if (isOpposed && position > desiredSize.Width - content.headerContent.DesiredSize.Height)
@@ -784,8 +574,7 @@ namespace Syncfusion.UI.Xaml.Charts
                 double plotOffset = chartAxis.ActualPlotOffset * 2;
                 if (0 < value && 1 > value)
                 {
-                    var area3D = element.Area as SfChart3D;
-                    var isOpposed = (area3D != null && area3D.ActualRotationAngle >= 180 && area3D.ActualRotationAngle < 360) ? true : element.OpposedPosition;
+                    var isOpposed = element.OpposedPosition;
 
                     if (isOpposed && elementRowIndex == actualRowIndex)
                     {

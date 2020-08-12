@@ -183,33 +183,6 @@ namespace Syncfusion.UI.Xaml.Charts
     }
 
     /// <summary>
-    /// A collection class which holds ChartSeries 3D.
-    /// </summary>
-   
-    public partial class ChartSeries3DCollection : ObservableCollection<ChartSeries3D>
-    {
-        /// <summary>
-        /// return ChartSeries from the given string
-        /// </summary>
-        /// <param name="name"></param>
-        public ChartSeries3D this[string name]
-        {
-            get
-            {
-                foreach (ChartSeries3D series in this)
-                {
-                    if (series.Name == name)
-                    {
-                        return series;
-                    }
-                }
-
-                return null;
-            }
-        }
-    }
-
-    /// <summary>
     /// A collection class which holds ChartRowDefinitions
     /// </summary>
    

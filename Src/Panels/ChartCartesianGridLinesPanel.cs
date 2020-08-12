@@ -244,97 +244,7 @@ namespace Syncfusion.UI.Xaml.Charts
             }
         }
 
-        /// <summary>
-        /// Draws the Gridlines at definite intervals in <see cref="ChartAxis"/>
-        /// </summary>
-        /// <param name="axis">Relevant ChartAxis</param>      
-        public void DrawGridLines3D(ChartAxis axis)
-        {
-            if (axis == null)
-                return;
-            double left = axis.RenderedRect.Left;
-            var right = axis.RenderedRect.Right;
-            var top = axis.RenderedRect.Top;
-            var bottom = axis.RenderedRect.Bottom;
 
-            double width;
-            double height;
-
-            var values = (from label in axis.VisibleLabels
-                          select label.Position).ToArray();
-            var categoryAxis = axis as CategoryAxis;
-            if (categoryAxis != null && categoryAxis.LabelPlacement == LabelPlacement.BetweenTicks)
-                values = (from pointValues in axis.SmallTickPoints select pointValues).ToArray();
-
-            if (axis.Orientation == Orientation.Horizontal)
-            {
-                width = right - left;
-                IEnumerable<ChartAxis> selectedAxes = null;
-                if (axis.RegisteredSeries.Count > 0)
-                {
-                    selectedAxes = axis.AssociatedAxes.DistinctBy(Area.GetActualRow);
-                }
-                else
-                {
-                    if (Area.InternalPrimaryAxis != null)
-                        selectedAxes = new List<ChartAxis> { Area.InternalSecondaryAxis };
-                }
-                var index = 0;
-                var smallTickIndex = 0;
-
-                for (int i = 0; i < selectedAxes.Count(); i++)
-                {
-                    var verticalAxis = Area.InternalSecondaryAxis.Orientation == Orientation.Vertical ? Area.InternalSecondaryAxis : Area.InternalPrimaryAxis;
-                    top = verticalAxis.ArrangeRect.Top;
-                    height = top + verticalAxis.ArrangeRect.Height;
-
-                    if (values.Length > 0)
-                        DrawGridLines3D(axis, axis.GridLinesRecycler, left, top, width, height, values, true, index);
-                    if (axis.smallTicksRequired)
-                    {
-                        var smallTickvalues = (from pointValues in axis.SmallTickPoints select pointValues).ToArray();
-                        if (smallTickvalues.Length > 0)
-                            DrawGridLines3D(axis, axis.MinorGridLinesRecycler, left, top, width, height, smallTickvalues, false, smallTickIndex);
-                        smallTickIndex += smallTickvalues.Length;
-                    }
-                    index += values.Length;
-                }
-            }
-            else
-            {
-                height = bottom - top;
-
-                IEnumerable<ChartAxis> selectedAxes = null;
-                if (axis.RegisteredSeries.Count > 0)
-                {
-                    selectedAxes = axis.AssociatedAxes.DistinctBy(Area.GetActualColumn);
-                }
-                else
-                {
-                    if (Area.InternalPrimaryAxis != null)
-                        selectedAxes = new List<ChartAxis> { Area.InternalPrimaryAxis };
-                }
-
-                var index = 0;
-                var smallTickIndex = 0;
-                foreach (var supportAxis in selectedAxes)
-                {
-                    left = supportAxis.ArrangeRect.Left;
-                    width = left + supportAxis.ArrangeRect.Width;
-                    if (values.Length > 0)
-                        DrawGridLines3D(axis, axis.GridLinesRecycler, left, top, width, height, values, true, index);
-                    if (axis.smallTicksRequired)
-                    {
-                        var smallTickvalues = (from pointValues in axis.SmallTickPoints select pointValues).ToArray();
-                        if (smallTickvalues.Length > 0)
-                            DrawGridLines3D(axis, axis.MinorGridLinesRecycler, left, top, width, height, smallTickvalues, false, smallTickIndex);
-                        smallTickIndex += smallTickvalues.Length;
-                    }
-
-                    index += values.Length;
-                }
-            }
-        }
 
         /// <summary>
         /// Measures the elements in the panel.
@@ -362,19 +272,6 @@ namespace Syncfusion.UI.Xaml.Charts
             return finalSize;
         }
 
-        /// <summary>
-        /// Arrranges the elements inside a panel.
-        /// </summary>
-        /// <param name="finalSize">Final size of the panel.</param>
-        /// <returns>Returns Size</returns>
-        public Size Arrange3D(Size finalSize)
-        {
-            foreach (var axis in Area.Axes.Where(axis => axis.ShowGridLines))
-            {
-                DrawGridLines3D(axis);
-            }
-            return finalSize;
-        }
 
         /// <summary>
         /// Seek the elements.
@@ -441,7 +338,7 @@ namespace Syncfusion.UI.Xaml.Charts
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Performance", "CA1800:DoNotCastUnnecessarily")]
         internal void UpdateStripLines()
         {
-            if (Area is SfChart3D) return;
+
             stripLines.Clear();
 
             foreach (
@@ -653,160 +550,6 @@ namespace Syncfusion.UI.Xaml.Charts
             }
         }
 
-        /// <summary>
-        /// Draws the gridlines with the specified values.
-        /// </summary>
-        /// <param name="axis">The Axis</param>
-        /// <param name="lines">The Lines</param>
-        /// <param name="left">The Left</param>
-        /// <param name="top">The Top</param>
-        /// <param name="width">The Width</param>
-        /// <param name="height">The Height</param>
-        /// <param name="values">The Values</param>
-        /// <param name="drawOrigin">Check For Draw Origin</param>
-        /// <param name="index">The Index</param>
-        private void DrawGridLines3D(ChartAxis axis, UIElementsRecycler<Line> lines, double left, double top, double width, double height, double[] values, bool drawOrigin, int index)
-        {
-            if (lines == null || axis == null)
-                return;
-
-            var labelsCount = values.Length;
-            var linesCount = lines.Count;
-            var orientation = axis.Orientation;
-            var area = Area as SfChart3D;
-            var actualRotationAngle = area.ActualRotationAngle;
-            double x1, x2, y1, y2;
-            if (orientation == Orientation.Horizontal)
-            {
-                var verticalAxis = Area.InternalSecondaryAxis.Orientation == Orientation.Vertical ? Area.InternalSecondaryAxis : Area.InternalPrimaryAxis;
-
-                int i;
-                for (i = 0; i < labelsCount; i++)
-                {
-                    if (i < linesCount)
-                    {
-                        var line = lines[index];
-                        var value = axis.ValueToCoefficientCalc(values[i]);
-                        value = double.IsNaN(value) ? 0 : value;
-
-                        var chartAxisBase3D = axis as ChartAxisBase3D;
-
-                        if (chartAxisBase3D.IsManhattanAxis && (axis.RegisteredSeries[i] as ChartSeries3D).Segments != null && (axis.RegisteredSeries[i] as ChartSeries3D).Segments.Count > 0)
-                        {
-                            var segment = (axis.RegisteredSeries[i] as ChartSeries3D).Segments[0] as ChartSegment3D;
-                            x2 = x1 = segment.startDepth + (segment.endDepth - segment.startDepth) / 2;
-                        }
-                        else
-                        {
-                            x2 = x1 = (Math.Round(width * value) + left);
-                        }
-
-                        y1 = top;
-                        y2 = height;
-                        if (area != null)
-                        {
-                            var actualDepth = area.ActualDepth > 2 ? area.ActualDepth - 2 : 1;
-                            var g3 = ((SfChart3D)Area).Graphics3D;
-
-                            if (chartAxisBase3D != null && chartAxisBase3D.IsZAxis)
-                            {
-                                Line3D line3DTemp = null;
-
-                                var actualLeft = !verticalAxis.OpposedPosition && actualRotationAngle >= 0 && actualRotationAngle < 180
-                                                 ? -axis.ArrangeRect.Left + axis.ArrangeRect.Width : -axis.ArrangeRect.Right - 1;
-
-                                line3DTemp = Polygon3D.CreateLine(line, x1, top, x2, height, actualLeft, actualLeft, true);
-                                line3DTemp.Transform(Matrix3D.Turn((float)(Math.PI / 2)));
-                                g3.AddVisual(line3DTemp);
-                            }
-                            else
-                            {
-                                var actualDepthD = (!verticalAxis.OpposedPosition && actualRotationAngle >= 90 && actualRotationAngle < 270) ? 1 : actualDepth;
-                                g3.AddVisual(Polygon3D.CreateLine(line, x1, y1, x2, y2, actualDepthD, actualDepthD, true));
-                            }
-
-                            var bottom = (area.Axes.Where(x => x.Orientation == Orientation.Horizontal && x.OpposedPosition).Any())
-                                ? (axis.Area.SeriesClipRect.Top) : (axis.Area.SeriesClipRect.Height + axis.Area.SeriesClipRect.Top);
-
-                            var parallelLine = new Line { Opacity = line.Opacity, StrokeThickness = line.StrokeThickness, Stroke = line.Stroke };
-                            Binding bind = new Binding();
-                            bind.Path = new PropertyPath("Visibility");
-                            bind.Source = line;
-                            parallelLine.SetBinding(Line.VisibilityProperty, bind);
-
-                            Line3D line3D = null;
-                            if (chartAxisBase3D != null && chartAxisBase3D.IsZAxis)
-                            {
-                                var actualLeft = 0d;
-                                var actualRight = 0d;
-
-                                if (!verticalAxis.OpposedPosition && actualRotationAngle >= 0 && actualRotationAngle < 180)
-                                {
-                                    actualLeft = axis.ArrangeRect.Left - axis.ArrangeRect.Width;
-                                    actualRight = axis.ArrangeRect.Left;
-                                }
-                                else
-                                {
-                                    actualLeft = axis.ArrangeRect.Left;
-                                    actualRight = axis.ArrangeRect.Right;
-                                }
-
-                                line3D = Polygon3D.CreateLine(parallelLine, actualLeft, -x1, actualRight, -x1, bottom, bottom, true);
-                                line3D.Transform(Matrix3D.Tilt((float)(Math.PI / 2)));
-
-                                g3.AddVisual(line3D);
-                            }
-                            else
-                            {
-                                line3D = Polygon3D.CreateLine(parallelLine, x2, 0, x2, -actualDepth, bottom, bottom, true);
-
-                                line3D.Transform(Matrix3D.Tilt((float)(Math.PI / 2)));
-
-                                g3.AddVisual(line3D);
-                            }
-                        }
-                    }
-
-                    index++;
-                }
-            }
-            else
-            {
-                int i;
-                for (i = 0; i < labelsCount; i++)
-                {
-                    if (i < linesCount)
-                    {
-                        var line = lines[index];
-                        var value = axis.ValueToCoefficientCalc(values[i]);
-                        value = double.IsNaN(value) ? 0 : value;
-                        x1 = left;
-                        y1 = Math.Round(height * (1 - value)) + 0.5 + top;
-                        x2 = width;
-                        y2 = y1;
-
-                        var ActualDepth = area.ActualDepth > 2 ? area.ActualDepth - 2 : 1;
-
-                        // Angle check for the automatic wall update. This 
-                        var actualDepthC = (!axis.OpposedPosition && actualRotationAngle >= 90 && actualRotationAngle < 270) ? 0 : ActualDepth;
-                        area.Graphics3D.AddVisual(Polygon3D.CreateLine(line, x1, y1, x2, y2, actualDepthC, actualDepthC, true));
-
-                        var sideLine = new Line { Opacity = line.Opacity, StrokeThickness = line.StrokeThickness, Stroke = line.Stroke };
-                        Binding bind = new Binding();
-                        bind.Path = new PropertyPath("Visibility");
-                        bind.Source = line;
-                        sideLine.SetBinding(Line.VisibilityProperty, bind);
-
-                        var ActualDepthD = axis.OpposedPosition || (!axis.OpposedPosition && actualRotationAngle >= 180 && actualRotationAngle < 360) ? axis.Area.SeriesClipRect.Width + axis.Area.SeriesClipRect.Left + 1 : axis.Area.SeriesClipRect.Left;
-
-                        var line3D = Polygon3D.CreateLine(sideLine, -ActualDepth, y2, 0, y2, ActualDepthD, ActualDepthD, true);
-                        line3D.Transform(Matrix3D.Turn((float)(-Math.PI / 2)));
-                        area.Graphics3D.AddVisual(line3D);
-                    }
-                    index++;
-                }
-            }
-        }
 
         /// <summary>
         /// Renders the stripline.

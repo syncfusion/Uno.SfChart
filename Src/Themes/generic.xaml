@@ -6,8 +6,6 @@
 
     <ResourceDictionary.MergedDictionaries>
         <ResourceDictionary Source="ms-appx:///Syncfusion.SfChart.Uno/Themes/ChartArea.xaml"/>
-        <ResourceDictionary Source="ms-appx:///Syncfusion.SfChart.Uno/Themes/SfChart3D.xaml"/>
-        <ResourceDictionary Source="ms-appx:///Syncfusion.SfChart.Uno/Themes/ChartSeries3D.xaml"/>
         <ResourceDictionary Source="ms-appx:///Syncfusion.SfChart.Uno/Themes/ChartAxis.xaml"/>
         <ResourceDictionary Source="ms-appx:///Syncfusion.SfChart.Uno/Themes/ChartSeries.xaml"/>
         <ResourceDictionary Source="ms-appx:///Syncfusion.SfChart.Uno/Themes/ResizableScrollBar.xaml"/>

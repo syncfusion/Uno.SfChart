@@ -375,7 +375,7 @@ namespace Syncfusion.UI.Xaml.Charts
                     case ChartAreaType.CartesianAxes:
 
                         legendSeries = from series in actualLegendSeries
-                                       where series is ISupportAxes2D || series is ISupportAxes3D
+                                       where series is ISupportAxes2D
                                        select series;
                         break;
                     case ChartAreaType.PolarAxes:
@@ -385,7 +385,7 @@ namespace Syncfusion.UI.Xaml.Charts
                         break;
                     default:
                         legendSeries = from series in actualLegendSeries
-                                       where series is AccumulationSeriesBase || series is CircularSeriesBase3D
+                                       where series is AccumulationSeriesBase
                                        select series;
                         break;
                 }
@@ -588,7 +588,7 @@ namespace Syncfusion.UI.Xaml.Charts
                 var legendIndex = i;
                 if (double.IsNaN(yvalues[i]))
                 {
-                    if (!(series is TriangularSeriesBase) && !(series is CircularSeriesBase3D))
+                    if (!(series is TriangularSeriesBase))
                         j++;
                     continue;
                 }

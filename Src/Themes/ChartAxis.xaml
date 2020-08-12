@@ -1245,29 +1245,20 @@
         </Setter>
     </Style>
     
-    <Style x:Key="gridLineStyle3D" TargetType="Line">
-        <Setter Property="Stroke" Value="Gray"></Setter>
-        <Setter Property="StrokeThickness" Value="1"></Setter>
-    </Style>
-    
+
     <Style TargetType="local:ChartAxis" 
 		   x:Key="DefaultChartAxisStyle">
         <Setter Property="MajorTickLineStyle" Value="{StaticResource lineStyle1}"></Setter>
         <Setter Property="MinorTickLineStyle" Value="{StaticResource lineStyle1}"></Setter>
-        <Setter Property="MajorGridLineStyle" Value="{StaticResource gridLineStyle3D}"></Setter>
-        <Setter Property="MinorGridLineStyle"  Value="{StaticResource gridLineStyle3D}"></Setter>
+        <Setter Property="MajorGridLineStyle" Value="{StaticResource gridLineStyle}"></Setter>
+        <Setter Property="MinorGridLineStyle"  Value="{StaticResource gridLineStyle}"></Setter>
         <Setter Property="AxisLineStyle" Value="{StaticResource lineStyle1}"></Setter>
     </Style>
 
 	<Style TargetType="local:ChartAxis"
 		   BasedOn="{StaticResource DefaultChartAxisStyle}" />
 
-	<!--These two Styles are only needed by Uno. The ChartAxis default style is used by these types on UWP, but Uno currently ignores the DefaultStyleKey property - https://github.com/unoplatform/uno/issues/119-->
-	<Style TargetType="local:NumericalAxis3D"
-		   BasedOn="{StaticResource DefaultChartAxisStyle}" />
 
-	<Style TargetType="local:CategoryAxis3D"
-		   BasedOn="{StaticResource DefaultChartAxisStyle}" />
 
 	<Style TargetType="local:CategoryAxis">
         <Setter Property="MajorTickLineStyle" Value="{StaticResource lineStyle1}"></Setter>

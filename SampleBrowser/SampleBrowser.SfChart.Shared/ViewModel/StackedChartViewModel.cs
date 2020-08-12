@@ -19,10 +19,14 @@ namespace SampleBrowser.SfChart
             this.Accidents = new List<Accidents>();
             DateTime mth = new DateTime(2011, 1, 1);
 
-            Accidents.Add(new Accidents() { Month = mth.AddMonths(6), Bus = 3, Car = 4, Truck = 5 });
-            Accidents.Add(new Accidents() { Month = mth.AddMonths(7), Bus = 4, Car = 5, Truck = 5 });
-            Accidents.Add(new Accidents() { Month = mth.AddMonths(8), Bus = 3, Car = 4, Truck = 5 });
-            Accidents.Add(new Accidents() { Month = mth.AddMonths(9), Bus = 4, Car = 5, Truck = 5 });
+            Accidents.Add(new Accidents() { Month = mth.AddMonths(6), Bus = 18, Car = 24, Truck = 33 });
+            Accidents.Add(new Accidents() { Month = mth.AddMonths(7), Bus = 16, Car = 22, Truck = 30 });
+            Accidents.Add(new Accidents() { Month = mth.AddMonths(8), Bus = 17, Car = 26, Truck = 34});
+            Accidents.Add(new Accidents() { Month = mth.AddMonths(9), Bus = 16, Car = 22, Truck = 29 });
+            Accidents.Add(new Accidents() { Month = mth.AddMonths(10), Bus = 15, Car = 25, Truck =31 });
+            Accidents.Add(new Accidents() { Month = mth.AddMonths(11), Bus = 16, Car = 23, Truck = 32 });
+
+
         }
 
         public List<StackedModel> MedalDetails { get; set; }

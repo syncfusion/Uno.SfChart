@@ -1183,9 +1183,8 @@ namespace Syncfusion.UI.Xaml.Charts
             var previousRectColl = new List<Rect>();
             var previousRect = new Rect();
 
-            var coefficient = series is CircularSeriesBase ? series is PieSeries ? ((PieSeries)series).InternalPieCoefficient : ((DoughnutSeries)series).InternalDoughnutCoefficient
-                : (series is DoughnutSeries3D) ? ((DoughnutSeries3D)series).InternlDoughnutCoefficient : ((PieSeries3D)series).InternalCircleCoefficient;
-            var center = series is CircularSeriesBase ? (series as CircularSeriesBase).Center : (series as CircularSeriesBase3D).Center;
+            var coefficient =  series is PieSeries ? ((PieSeries)series).InternalPieCoefficient : ((DoughnutSeries)series).InternalDoughnutCoefficient;
+            var center = (series as CircularSeriesBase).Center;
             double baseRight = pieRight, baseLeft = pieLeft;
 
             pieLeft = (finalSize.Width / 2 - radius) - radius * 0.5;
@@ -1196,7 +1195,7 @@ namespace Syncfusion.UI.Xaml.Charts
             pieRight = pieRight > baseRight ? baseRight : pieRight;
             pieLeft = pieLeft < baseLeft ? baseLeft : pieLeft;
 
-            double explodRadius, angle;
+            double explodRadius =0, angle;
             ConnectorMode connectorMode;
             int explodeIndex = -1;
             var circularSeriesBase = series as CircularSeriesBase;
@@ -1206,18 +1205,7 @@ namespace Syncfusion.UI.Xaml.Charts
                 explodRadius = circularSeriesBase.ExplodeRadius;
                 connectorMode = circularSeriesBase.ConnectorType;
             }
-            else
-            {
-                var circularSeriesBase3D = series as CircularSeriesBase3D;
-                explodeIndex = circularSeriesBase3D.ExplodeAll ? -2 : circularSeriesBase3D.ExplodeIndex;
-                explodRadius = circularSeriesBase3D.ExplodeRadius;
-                if (explodeIndex == circularSeriesBase3D.Segments.Count - 1 || circularSeriesBase3D.ExplodeAll)
-                {
-                    var rect = new Rect(0, 0, finalSize.Width, finalSize.Height);
-                    center = circularSeriesBase3D.GetActualCenter(new Point(rect.X + rect.Width / 2, rect.Y + rect.Height / 2), radius);
-                }
-                connectorMode = circularSeriesBase3D.ConnectorType;
-            }
+
             for (var i = 0; i < orderedAdornments.Count(); i++)
             {
                 var renderingPoints = new List<Point>();
@@ -1299,8 +1287,6 @@ namespace Syncfusion.UI.Xaml.Charts
                     previousRectColl.Add(currRect);
                 }
 
-                DrawConnectorLine(adornmentIndex, renderingPoints, connectorMode, this.Series is CircularSeriesBase3D, 0);
-
                 if (!ShowLabel) continue;
                 var chartAdornmentInfo = this as ChartAdornmentInfo;
                 if (chartAdornmentInfo != null)
@@ -1323,8 +1309,6 @@ namespace Syncfusion.UI.Xaml.Charts
                             chartAdornmentInfo.AlignAdornmentLabelPosition(label, LabelPosition, x + OffsetX, y + OffsetY, adornmentIndex);
                     }
                 }
-                else
-                    ((ChartAdornmentInfo3D)this).AddLabel(label, x, y, (adornment as ChartAdornment3D).ActualStartDepth, adornmentIndex);
 
                 if (ShowMarkerAtEdge2D && circularSeriesBase != null && ShowMarker && adormentContainers != null && adornmentIndex < adormentContainers.Count)
                 {
@@ -1419,10 +1403,7 @@ namespace Syncfusion.UI.Xaml.Charts
             var element = ConnectorLines[connectorIndex];
             if (connectorLineMode == ConnectorMode.Bezier)
                 drawingPoints = GetBezierApproximation(drawingPoints, 256);
-            if (is3DChart)
-                (this as ChartAdornmentInfo3D).DrawLineSegment3D(drawingPoints, element, depth, connectorIndex);
-            else
-                (this as ChartAdornmentInfo).DrawLineSegment(drawingPoints, element);
+            (this as ChartAdornmentInfo).DrawLineSegment(drawingPoints, element);
         }
 
         /// <summary>
@@ -1499,10 +1480,10 @@ namespace Syncfusion.UI.Xaml.Charts
             if (isPie)
             {
                 drawingPoints.Clear();
-                double explodedRadius;
-                int explodeIndex;
-                CircularSeriesLabelPosition labelPosition;
-                bool enableSmartLabels;
+                double explodedRadius =-1;
+                int explodeIndex =0;
+                CircularSeriesLabelPosition labelPosition = CircularSeriesLabelPosition.Inside;
+                bool enableSmartLabels = false;
                 //Get the values like explode radius, index.., from pie series
                 var circularSeriesBase = series as CircularSeriesBase;
                 if (circularSeriesBase != null)
@@ -1520,13 +1501,7 @@ namespace Syncfusion.UI.Xaml.Charts
                 }
                 else
                 {
-                    var circularSeriesBase3D = series as CircularSeriesBase3D;
-                    explodedRadius = circularSeriesBase3D.ExplodeRadius;
-                    explodeIndex = circularSeriesBase3D.ExplodeIndex;
-                    labelPosition = circularSeriesBase3D.LabelPosition;
-                    explodeIndex = circularSeriesBase3D.ExplodeAll ? -2 : explodeIndex;
-                    enableSmartLabels = circularSeriesBase3D.EnableSmartLabels && ShowLabel && label != null;
-                    center = circularSeriesBase3D.Center;
+
                 }
 
                 explodedRadius = explodeIndex == labelIndex || explodeIndex == -2 ? explodedRadius : 0d;
@@ -1534,8 +1509,6 @@ namespace Syncfusion.UI.Xaml.Charts
                 if (labelPosition != CircularSeriesLabelPosition.Inside)
                 {
                     labelRadiusFromOrigin = pieRadius + connectorHeight;
-                    if (Series is CircularSeriesBase3D && (explodeIndex == (Series as CircularSeriesBase3D).Segments.Count - 1 || (Series as CircularSeriesBase3D).ExplodeAll))
-                        center = new Point(finalSize.Width / 2, finalSize.Height / 2);
                     center.X = center.X + (Math.Cos((angle)) * explodedRadius);
                     center.Y = center.Y + (Math.Sin((angle)) * explodedRadius);
 
@@ -1724,7 +1697,7 @@ namespace Syncfusion.UI.Xaml.Charts
         internal void GetActualLabelPosition(ChartAdornment adornment)
         {
             if (this.Series is RangeSeriesBase || this.Series is FinancialSeriesBase
-                || this.Series is CircularSeriesBase3D || this.Series is AccumulationSeriesBase
+                 || this.Series is AccumulationSeriesBase
                 || this.Series is PolarRadarSeriesBase || this.Series is BoxAndWhiskerSeries)
             {
                 //The label positioning has been already algned for the above series.
@@ -2025,7 +1998,7 @@ namespace Syncfusion.UI.Xaml.Charts
                 adornment.BindColorProperties();
                 Binding binding = new Binding { Source = this, Path = new PropertyPath("ConnectorHeight") };
                 BindingOperations.SetBinding(adornment, ChartAdornment.ConnectorHeightProperty, binding);
-                if (series is CircularSeriesBase || series is CircularSeriesBase3D)
+                if (series is CircularSeriesBase)
                     binding = new Binding { Source = adornment, Path = new PropertyPath("Angle") };
                 else
                     binding = new Binding
@@ -2072,8 +2045,7 @@ namespace Syncfusion.UI.Xaml.Charts
 
         private Point CalculateConnectorLinePoint(ref double x, ref double y, ChartAdornment adornment, double angle, int index)
         {
-            var actualLabelPos = Series is ChartSeries3D ? (Series as ChartSeries3D).Adornments[index].ActualLabelPosition :
-                (Series as AdornmentSeries).Adornments[index].ActualLabelPosition;
+            var actualLabelPos =  (Series as AdornmentSeries).Adornments[index].ActualLabelPosition;
             switch (actualLabelPos)
             {
                 case ActualLabelPosition.Top:
@@ -2098,23 +2070,13 @@ namespace Syncfusion.UI.Xaml.Charts
             }
 
             if (LabelPosition == AdornmentsLabelPosition.Auto
-                && ((Series is ChartSeries3D) || !((Series.ActualYAxis as ChartAxisBase2D).ZoomFactor < 1
+                && (!((Series.ActualYAxis as ChartAxisBase2D).ZoomFactor < 1
                 || (Series.ActualXAxis as ChartAxisBase2D).ZoomFactor < 1)))
             {
                 if (Series is PolarRadarSeriesBase)
                 {
                     x = (x < 0) ? 0 : (x > Series.ActualArea.SeriesClipRect.Width) ? Series.ActualArea.SeriesClipRect.Width : x;
                     y = (y < 0) ? 0 : (y > Series.ActualArea.SeriesClipRect.Height) ? Series.ActualArea.SeriesClipRect.Height : y;
-                }
-
-                // WPF-25905 The boundary for the 3D series is calculated using axis size for accuracy.
-                else if (Series is ChartSeries3D)
-                {
-                    double seriesHeight = series.IsActualTransposed ? series.ActualXAxis.RenderedRect.Height : series.ActualYAxis.RenderedRect.Height;
-                    double seriesWidth = series.IsActualTransposed ? series.ActualYAxis.RenderedRect.Right : series.ActualXAxis.RenderedRect.Right;
-
-                    x = (x < 0) ? 0 : (x > seriesWidth) ? seriesWidth : x;
-                    y = (y < 0) ? 0 : (y > seriesHeight) ? seriesHeight : y;
                 }
                 else
                 {
@@ -2819,7 +2781,7 @@ namespace Syncfusion.UI.Xaml.Charts
             if (ShowConnectorLine || (circularSeriesBase != null && circularSeriesBase.EnableSmartLabels))
             {
                 var connectorLineMode = circularSeriesBase != null ? circularSeriesBase.ConnectorType : ConnectorMode.Line;
-                var isPie = pieAdornment != null || adornment is ChartPieAdornment3D;
+                var isPie = pieAdornment != null;
                 if (label != null && LabelPosition != AdornmentsLabelPosition.Default && ConnectorHeight > 0)
                 {
                     if (Series is BubbleSeries || Series is ScatterSeries)
@@ -3312,781 +3274,4 @@ namespace Syncfusion.UI.Xaml.Charts
         #endregion
     }
 
-    /// <summary>
-    /// Represents the class used for configuring chart adornments for 3D chart.
-    /// </summary>
-    /// <remarks>
-    /// Chart adornments are used to show additional information about the data point.
-    /// </remarks>
-    /// <example>
-    /// This example, we are using <see cref="PieSeries3D"/>.
-    /// </example>
-    /// <example>
-    ///     <code language="XAML">
-    ///         &lt;syncfusion:PieSeries3D&gt;
-    ///             &lt;syncfusion:PieSeries3D.AdornmentInfo&gt;
-    ///                 &lt;syncfusion:ChartAdornmentInfo3D&gt;
-    ///             &lt;/syncfusion:PieSeries3D.AdornmentInfo&gt;
-    ///         &lt;syncfusion:PieSeries3D&gt;
-    ///     </code>
-    ///     <code language="C#">
-    ///         ChartAdornmentInfo3D chartAdornmentInfo = new ChartAdornmentInfo();
-    ///         pieSeries3D.AdornmentInfo = chartAdornmentInfo;
-    ///     </code>
-    /// </example>
-    public sealed class ChartAdornmentInfo3D : ChartAdornmentInfoBase
-    {
-        #region Fields
-
-        #region Private Fields
-
-        double depth;
-
-        int index;
-
-        private Graphics3D graphics3D;
-
-        #endregion
-
-        #endregion
-
-        #region Methods
-
-        #region Internal Override Methods
-
-        internal override void Arrange(Size finalSize)
-        {
-            graphics3D = ((SfChart3D)series.ActualArea).Graphics3D;
-            if (series is CircularSeriesBase3D)
-                (series as CircularSeriesBase3D).Area.IsAutoDepth = true;
-            double pieLeft = 0d, pieRight = 0d, pieRadius = 0d;
-            var circularSeriesBase3D = series as CircularSeriesBase3D;
-            var isPieSeriesExtendedLabels = circularSeriesBase3D != null && circularSeriesBase3D.LabelPosition == CircularSeriesLabelPosition.OutsideExtended && circularSeriesBase3D.EnableSmartLabels;
-            AdornmentInfoSize = finalSize;
-
-            var index = 0;
-
-            if (LabelPresenters != null && LabelPresenters.Count > 0 && circularSeriesBase3D != null)
-            {
-                foreach (var pieAdornment in Series.Adornments.Select(adornment => adornment as ChartPieAdornment3D))
-                {
-                    if (pieAdornment.ConnectorRotationAngle % (Math.PI * 2) <= 1.57 || pieAdornment.ConnectorRotationAngle % (Math.PI * 2) >= 4.71)
-                    {
-                        pieLeft = Math.Max(pieLeft, LabelPresenters[index].DesiredSize.Width);
-                    }
-                    else
-                    {
-                        pieRight = Math.Max(pieRight, LabelPresenters[index].DesiredSize.Width);
-                    }
-                    index++;
-                }
-                if (series.Adornments.Count > 0)
-                {
-                    var pieAdornment3D = series.Adornments[0] as ChartPieAdornment3D;
-
-                    pieRadius = pieAdornment3D.Radius;
-                }
-                pieRight = finalSize.Width - pieRight;
-            }
-
-            var adornmentIndex = 0;
-            var labelBounds = new List<Rect>();
-
-            foreach (var adornment in series.Adornments)
-            {
-                var transformer = series.CreateTransformer(finalSize, false);
-                adornment.Update(transformer);
-
-                var chartAdornment3D = adornment as ChartAdornment3D;
-                //WPF-25896,Adornments and connector lines in the 3D series are not cropped when maximum and minimum is set for the xaxis.
-                if (!(Series is CircularSeriesBase3D))
-                {
-                    double left = Series.ActualArea.SeriesClipRect.Left;
-                    double top = Series.ActualArea.SeriesClipRect.Top;
-                    double bottom = Series.ActualArea.SeriesClipRect.Bottom;
-                    double right = Series.ActualArea.SeriesClipRect.Right;
-                    double frontDepth = 0d;
-                    double backDepth = (Series.ActualArea as SfChart3D).ActualDepth;
-                    var actualStartDepth = chartAdornment3D.ActualStartDepth;
-
-                    if (adormentContainers != null && (adornment.Y > bottom || adornment.Y < top)
-                        || (adornment.X > right || adornment.X < left)
-                        || (actualStartDepth < frontDepth
-                        || actualStartDepth > backDepth))
-                    {
-                        adornmentIndex++;
-                        continue;
-                    }
-                }
-
-                if (adormentContainers != null && adornmentIndex < adormentContainers.Count && !double.IsNaN(adornment.Y)
-                    && !double.IsNaN(adornment.X))
-                {
-                    var adornmentPresenter = adormentContainers[adornmentIndex];
-                    var x = adornment.X - adornmentPresenter.SymbolOffset.X;
-                    var y = adornment.Y - adornmentPresenter.SymbolOffset.Y;
-                    adornmentPresenter.Measure(new Size(double.PositiveInfinity, double.PositiveInfinity));
-                    var size = adornmentPresenter.DesiredSize;
-                    x += size.Width == 0 ? 0 : size.Width / 2;
-                    y += size.Height == 0 ? 0 : size.Height / 2;
-
-                    double depth = chartAdornment3D.ActualStartDepth;
-
-                    if (this.Series is CircularSeriesBase3D || this.Series is LineSeries3D || this.Series is AreaSeries3D)
-                        ((ChartSeries3D)series).Area.Graphics3D.AddVisual(Polygon3D.CreateUIElement(new Vector3D(x, y, depth), adornmentPresenter, 0, -adornmentPresenter.DesiredSize.Height, true, UIElementLeftShift.LeftHalfShift, UIElementTopShift.TopHalfShift));
-                    else
-                    {
-                        var angleModifiedDepth = ModifyDepthToAngle(depth, adornmentPresenter, index);
-                        var angleModifiedLeft = ModifyLeftToAngle(x, adornmentPresenter, index);
-
-                        var actualRotationAngle = (this.Series.ActualArea as SfChart3D).ActualRotationAngle;
-
-                        if ((actualRotationAngle >= 315 || actualRotationAngle < 45) || (actualRotationAngle >= 135 && actualRotationAngle < 225))
-
-                            ((ChartSeries3D)series).Area.Graphics3D.AddVisual(Polygon3D.CreateUIElement(new Vector3D(angleModifiedLeft, y, angleModifiedDepth), adornmentPresenter, 0, -adornmentPresenter.DesiredSize.Height, true, UIElementLeftShift.LeftHalfShift, UIElementTopShift.TopHalfShift));
-                        else
-                            ((ChartSeries3D)series).Area.Graphics3D.AddVisual(Polygon3D.CreateUIElement(new Vector3D(angleModifiedLeft, y, angleModifiedDepth), adornmentPresenter, 0, -adornmentPresenter.DesiredSize.Height, false, UIElementLeftShift.LeftHalfShift, UIElementTopShift.TopHalfShift));
-
-                    }
-                }
-                //Update the outside and inside labels
-                if (!isPieSeriesExtendedLabels)
-                    UpdateLabelPos(pieRadius, labelBounds, finalSize, adornment, adornmentIndex, pieLeft, pieRight);
-                adornmentIndex++;
-            }
-            //Update the outside extended labels
-            if (isPieSeriesExtendedLabels)
-            {
-                UpdateSpiderLabels(pieLeft, pieRight, finalSize, pieRadius);
-            }
-
-            if (ConnectorLines != null)
-                foreach (var line in ConnectorLines)
-                {
-                    Canvas.SetLeft(line, 0);
-                    Canvas.SetTop(line, 0);
-                }
-        }
-        
-        internal override DependencyObject CloneAdornmentInfo()
-        {
-            var adornment = new ChartAdornmentInfo3D();
-            adornment.ShowLabel = this.ShowLabel;
-            adornment.ShowMarker = this.ShowMarker;
-            adornment.Symbol = this.Symbol;
-            adornment.SymbolHeight = this.SymbolHeight;
-            adornment.SymbolInterior = this.SymbolInterior;
-            adornment.SymbolStroke = this.SymbolStroke;
-            adornment.SymbolTemplate = this.SymbolTemplate;
-            adornment.SymbolWidth = this.SymbolWidth;
-            adornment.ShowConnectorLine = this.ShowConnectorLine;
-            adornment.SegmentLabelFormat = this.SegmentLabelFormat;
-            adornment.SegmentLabelContent = this.SegmentLabelContent;
-            adornment.LabelTemplate = this.LabelTemplate;
-            adornment.HorizontalAlignment = this.HorizontalAlignment;
-            adornment.ConnectorLineStyle = this.ConnectorLineStyle;
-            adornment.LabelRotationAngle = this.LabelRotationAngle;
-            adornment.UseSeriesPalette = this.UseSeriesPalette;
-            return adornment;
-        }
-
-        #endregion
-
-        #region Internal Methods
-        
-        internal void AddLabel(UIElement element, double x, double y, double depth, int index)
-        {
-
-            if (this.Series is CircularSeriesBase3D || this.Series is LineSeries3D || this.Series is AreaSeries3D)
-            {
-                graphics3D.AddVisual(Polygon3D.CreateUIElement(new Vector3D(x, y, depth - 1), element, 0, -element.DesiredSize.Height, true, UIElementLeftShift.LeftHalfShift, UIElementTopShift.TopHalfShift));
-
-            }
-            else
-            {
-                var angleModifiedDepth = ModifyDepthToAngle(depth, element, index);
-                var angleModifiedLeft = ModifyLeftToAngle(x, element, index);
-
-                var actualRotationAngle = (this.Series.ActualArea as SfChart3D).ActualRotationAngle;
-
-                if ((actualRotationAngle >= 315 || actualRotationAngle < 45) || (actualRotationAngle >= 135 && actualRotationAngle < 225))
-                    graphics3D.AddVisual(Polygon3D.CreateUIElement(new Vector3D(angleModifiedLeft, y, angleModifiedDepth), element, 0, -element.DesiredSize.Height, true, UIElementLeftShift.LeftHalfShift, UIElementTopShift.TopHalfShift));
-                else
-                    graphics3D.AddVisual(Polygon3D.CreateUIElement(new Vector3D(angleModifiedLeft, y, angleModifiedDepth), element, 0, -element.DesiredSize.Height, false, UIElementLeftShift.LeftHalfShift, UIElementTopShift.TopHalfShift));
-            }
-        }
-
-        internal void DrawLineSegment3D(List<Point> points, Path path, double actualDepth, int CurrentIndex)
-        {
-            depth = actualDepth;
-            index = CurrentIndex;
-            DrawLineSegment(points, path);
-        }
-
-        internal void AlignAdornmentLabelPosition3D(FrameworkElement control, AdornmentsLabelPosition labelPosition, ref double actualX, ref double actualY, int index)
-        {
-            if (Series is ChartSeries3D)
-            {
-                if (double.IsNaN((Series as ChartSeries3D).Adornments[index].YData) || control == null) return;
-
-                double padding = !(ShowConnectorLine) || (ConnectorHeight <= 0)
-                    ? LabelPadding : 0.0;
-
-                switch (labelPosition)
-                {
-                    case AdornmentsLabelPosition.Auto:
-                        if (Series is StackingColumnSeries3D || Series is StackingBarSeries3D)
-                        {
-                            AlignInnerLabelPosition3D(control, index, ref actualX, ref actualY);
-                        }
-                        else if (Series is LineSeries3D)
-                        {
-                            if (Series.ActualYAxis.IsInversed)
-                            {
-                                if ((Series as CartesianSeries3D).IsActualTransposed)
-                                    actualX = IsTop(index) ? actualX - control.DesiredSize.Width + padding
-                                                           : actualX + control.DesiredSize.Width + padding;
-                                else
-                                    actualY = IsTop(index) ? actualY + control.DesiredSize.Height + padding
-                                                           : actualY - control.DesiredSize.Height - padding;
-                            }
-                            else
-                            {
-                                if ((Series as CartesianSeries3D).IsActualTransposed)
-                                    actualX = IsTop(index) ? actualX + control.DesiredSize.Width + padding
-                                                           : actualX - control.DesiredSize.Width - padding;
-                                else
-                                    actualY = IsTop(index) ? actualY - control.DesiredSize.Height + padding
-                                                           : actualY + control.DesiredSize.Height + padding;
-                            }
-
-                        }
-                        else if (!(Series is CircularSeriesBase3D))
-                        {
-                            AlignOuterLabelPosition3D(control, index, ref actualX, ref actualY);
-                        }
-
-                        // WPF-25905 The boundary for the 3D series is calculated using axis size for accuracy.
-                        double seriesHeight = (Series is CircularSeriesBase3D) ? (Series as CircularSeriesBase3D).Center.Y * 2 : series.IsActualTransposed ? series.ActualXAxis.RenderedRect.Height : series.ActualYAxis.RenderedRect.Height;
-                        double seriesWidth = (Series is CircularSeriesBase3D) ? (Series as CircularSeriesBase3D).Center.X * 2 : series.IsActualTransposed ? series.ActualYAxis.RenderedRect.Right : series.ActualXAxis.RenderedRect.Right;
-
-                        if ((actualY < 0 || actualY + control.DesiredSize.Height > seriesHeight) && (Series is ColumnSeries3D))
-                            AlignInnerLabelPosition3D(control, index, ref actualX, ref actualY);
-
-                        if ((actualX < 0 || actualX + control.DesiredSize.Width > seriesWidth) && Series is BarSeries3D)
-                            AlignInnerLabelPosition3D(control, index, ref actualX, ref actualY);
-
-                        actualY = (actualY < 0) ? padding : (actualY + control.DesiredSize.Height / 2 > seriesHeight) ? seriesHeight - control.DesiredSize.Height / 2 - padding : actualY;
-                        actualX = (actualX < 0) ? padding : (actualX + control.DesiredSize.Width / 2 > seriesWidth) ? seriesWidth - control.DesiredSize.Width / 2 - padding : actualX;
-
-                        break;
-
-                    case AdornmentsLabelPosition.Inner:
-                        if (Series is LineSeries3D)
-                        {
-                            if (Series.ActualYAxis.IsInversed)
-                            {
-                                if ((Series as CartesianSeries3D).IsActualTransposed)
-
-                                    actualX = IsTop(index) ? actualX + control.DesiredSize.Width + padding
-                                                           : actualX - control.DesiredSize.Width - padding;
-
-                                else
-                                    actualY = IsTop(index) ? actualY - control.DesiredSize.Height + padding
-                                                           : actualY + control.DesiredSize.Height + padding;
-                            }
-                            else
-                            {
-                                if ((Series as CartesianSeries3D).IsActualTransposed)
-
-                                    actualX = IsTop(index) ? actualX - control.DesiredSize.Width + padding
-                                                           : actualX + control.DesiredSize.Width + padding;
-
-                                else
-
-                                    actualY = IsTop(index) ? actualY + control.DesiredSize.Height + padding
-                                                           : actualY - control.DesiredSize.Height - padding;
-
-                            }
-                        }
-                        else
-                        {
-                            AlignInnerLabelPosition3D(control, index, ref actualX, ref actualY);
-                        }
-
-                        break;
-
-                    case AdornmentsLabelPosition.Outer:
-                        if (Series is LineSeries3D)
-                        {
-                            if (Series.ActualYAxis.IsInversed)
-                            {
-                                if ((Series as CartesianSeries3D).IsActualTransposed)
-
-                                    actualX = IsTop(index) ? actualX - control.DesiredSize.Width + padding
-                                                           : actualX + control.DesiredSize.Width + padding;
-
-                                else
-
-                                    actualY = IsTop(index) ? actualY + control.DesiredSize.Height + padding
-                                                           : actualY - control.DesiredSize.Height - padding;
-
-                            }
-                            else
-                            {
-                                if ((Series as CartesianSeries3D).IsActualTransposed)
-
-                                    actualX = IsTop(index) ? actualX + control.DesiredSize.Width + padding
-                                                           : actualX - control.DesiredSize.Width - padding;
-
-                                else
-                                    actualY = IsTop(index) ? actualY - control.DesiredSize.Height + padding
-                                                           : actualY + control.DesiredSize.Height + padding;
-                            }
-                        }
-                        else
-                        {
-                            AlignOuterLabelPosition3D(control, index, ref actualX, ref actualY);
-                        }
-
-                        break;
-                }
-            }
-        }
-
-        #endregion
-
-        #region Protected Override Methods
-
-        protected override void DrawLineSegment(List<Point> points, Path path)
-        {
-            double position = 0d;
-            double angleModifiedDepth = ModifyDepthToAngle(depth, path, index);
-            double angleModifiedLeft = ModifyLeftToAngle(position, path, index);
-
-            for (int i = 0; i < points.Count; i++)
-            {
-                points[i] = new Point(points[i].X + angleModifiedLeft, points[i].Y);
-            }
-            var actualRotationAngle = (this.Series.ActualArea as SfChart3D).ActualRotationAngle;
-
-            if (this.Series is CircularSeriesBase3D || this.Series is LineSeries3D || this.Series is AreaSeries3D)
-            {
-                graphics3D.AddVisual(Polygon3D.CreatePolyline(points.Get3DVector(depth), path, true));
-            }
-            else
-            {
-                if ((actualRotationAngle >= 315 || actualRotationAngle < 45) || (actualRotationAngle >= 135 && actualRotationAngle < 225))
-
-                    graphics3D.AddVisual(Polygon3D.CreatePolyline(points.Get3DVector(angleModifiedDepth), path, true));
-                else
-                    graphics3D.AddVisual(Polygon3D.CreatePolyline(points.Get3DVector(angleModifiedDepth), path, false));
-            }
-
-            base.DrawLineSegment(points, path);
-        }
-
-        #endregion
-
-        #region Private Methods
-
-        private void AlignOuterLabelPosition3D(FrameworkElement control, int index, ref double actualX, ref double actualY)
-        {
-            double height = control.DesiredSize.Height;
-            double width = control.DesiredSize.Width;
-            double padding = !(ShowConnectorLine) || ConnectorHeight <= 0 ? LabelPadding : (Series is BarSeries3D) ? width / 2 : height / 2;
-
-            if (Series is ScatterSeries3D)
-            {
-                ScatterSegment3D segment = Series.Segments[index] as ScatterSegment3D;
-                padding = padding - (!ShowConnectorLine || ConnectorHeight <= 0 ? segment.ScatterHeight / 2 : 0);
-            }
-            if (Series is CircularSeriesBase3D)
-            {
-                var pieSeries = Series as CircularSeriesBase3D;
-                Point center = pieSeries.Center;
-
-                double angle = pieSeries.Adornments[index].ConnectorRotationAngle;
-
-                if (!pieSeries.EnableSmartLabels)
-                {
-                    if (pieSeries.LabelPosition == CircularSeriesLabelPosition.OutsideExtended && ShowConnectorLine)
-                    {
-                        actualX = (actualX > center.X) ? actualX + width / 2 : actualX - width / 2;
-                    }
-                    else
-                    {
-                        actualX = actualX + Math.Cos(angle) * (width / 2);
-                        actualY = actualY + Math.Sin(angle) * (height / 2);
-                    }
-                }
-            }
-            else
-            {
-                var actualLabelPos = Series is ChartSeries3D ? (Series as ChartSeries3D).Adornments[index].ActualLabelPosition :
-                                     (Series as AdornmentSeries).Adornments[index].ActualLabelPosition;
-                switch (actualLabelPos)
-                {
-                    case ActualLabelPosition.Top:
-                        actualY = actualY - height + padding;
-                        break;
-                    case ActualLabelPosition.Left:
-                        actualX = actualX - width + padding;
-                        break;
-                    case ActualLabelPosition.Bottom:
-                        actualY = actualY + height - padding;
-                        break;
-                    case ActualLabelPosition.Right:
-                        actualX = actualX + width - padding;
-                        break;
-                }
-            }
-        }
-
-        private void AlignInnerLabelPosition3D(FrameworkElement control, int index, ref double actualX, ref double actualY)
-        {
-            double height = control.DesiredSize.Height;
-            double width = control.DesiredSize.Width;
-            double padding = !(ShowConnectorLine) || ConnectorHeight <= 0 ? LabelPadding : (Series is BarSeries3D) ? width / 2 : height / 2;
-
-            if (Series is ScatterSeries3D)
-            {
-                ScatterSegment3D segment = Series.Segments[index] as ScatterSegment3D;
-                padding = padding + (!ShowConnectorLine || ConnectorHeight <= 0 ? segment.ScatterHeight / 2 : 0);
-            }
-
-            if (Series is CircularSeriesBase3D)
-            {
-                var pieSeries = series as CircularSeriesBase3D;
-                Point center = pieSeries.Center;
-                double angle = pieSeries.Adornments[index].ConnectorRotationAngle;
-
-                if (!pieSeries.EnableSmartLabels)
-                {
-                    if (pieSeries.LabelPosition == CircularSeriesLabelPosition.OutsideExtended && ShowConnectorLine)
-                    {
-                        actualX = (actualX > center.X) ? actualX - width / 2 : actualX + width / 2;
-                    }
-                    else
-                    {
-                        actualX = actualX - Math.Cos(angle) * (width / 2);
-                        actualY = actualY - Math.Sin(angle) * (height / 2);
-                    }
-                }
-            }
-            else
-            {
-                var actualLabelPos = Series is ChartSeries3D ? (Series as ChartSeries3D).Adornments[index].ActualLabelPosition :
-                                    (Series as AdornmentSeries).Adornments[index].ActualLabelPosition;
-                switch (actualLabelPos)
-                {
-                    case ActualLabelPosition.Top:
-                        actualY = actualY + height - padding;
-                        break;
-                    case ActualLabelPosition.Left:
-                        actualX = actualX + width - padding;
-                        break;
-                    case ActualLabelPosition.Bottom:
-                        actualY = actualY - height + padding;
-                        break;
-                    case ActualLabelPosition.Right:
-                        actualX = actualX - width + padding;
-                        break;
-                }
-            }
-        }
-
-        private void UpdateLabelPos(
-            double pieRadius, 
-            IList<Rect> bounds, 
-            Size finalSize, 
-            ChartAdornment adornment,
-            int labelIndex, 
-            double pieLeft,
-            double pieRight)
-        {
-            if (adornment == null) return;
-
-            var adornment3D = adornment as ChartAdornment3D;
-            double x = adornment.X, y = adornment.Y;
-
-            var label = LabelPresenters != null && LabelPresenters.Count > 0 ? LabelPresenters[labelIndex] : null;
-
-            if (label != null && (double.IsNaN(x) || double.IsNaN(y)))
-            {
-                label.Visibility = Visibility.Collapsed;
-                return;
-            }
-            GetActualLabelPosition(adornment);
-
-            //Reset the visibility if the visibility is collapsed from collision.
-            if (ConnectorLines.Count > labelIndex)
-            {
-                ConnectorLines[labelIndex].Visibility = Visibility.Visible;
-            }
-
-            var circularSeriesBase = series as CircularSeriesBase3D;
-
-            if (ShowConnectorLine || (circularSeriesBase != null && circularSeriesBase.EnableSmartLabels && ShowLabel))
-            {
-                var connectorMode = series is CircularSeriesBase3D ? ((CircularSeriesBase3D)series).ConnectorType : ConnectorMode.Line;
-
-                if (label != null && LabelPosition != AdornmentsLabelPosition.Default && (Series is ScatterSeries3D) && ConnectorHeight > 0)
-                {
-                    var angle = (6.28 * (1 - (adornment.ConnectorRotationAngle / 360.0)));
-                    double scatterRadius = (Series.Segments[labelIndex] as ScatterSegment3D).ScatterHeight / 2;
-                    if (LabelPosition == AdornmentsLabelPosition.Outer)
-                    {
-                        if (this.Series.ActualYAxis.IsInversed ^ (adornment.YData < 0 || AdornmentsPosition == Charts.AdornmentsPosition.Bottom))
-                        {
-                            x = x - (Math.Cos(angle) * scatterRadius);
-                            y = y - (Math.Sin(angle) * scatterRadius);
-                        }
-                        else
-                        {
-                            x = x + (Math.Cos(angle) * scatterRadius);
-                            y = y + (Math.Sin(angle) * scatterRadius);
-                        }
-                    }
-
-                    else if (LabelPosition == AdornmentsLabelPosition.Inner && (scatterRadius - label.DesiredSize.Height / 2 > 0))
-                    {
-                        if (this.Series.ActualYAxis.IsInversed ^ (adornment.YData < 0 || AdornmentsPosition == Charts.AdornmentsPosition.Bottom))
-                        {
-                            x = x - (Math.Cos(angle) * (scatterRadius - label.DesiredSize.Height / 2));
-                            y = y - (Math.Sin(angle) * (scatterRadius - label.DesiredSize.Height / 2));
-                        }
-                        else
-                        {
-                            x = x + (Math.Cos(angle) * (scatterRadius - label.DesiredSize.Height / 2));
-                            y = y + (Math.Sin(angle) * (scatterRadius - label.DesiredSize.Height / 2));
-                        }
-                    }
-                }
-
-                var isPie = adornment is ChartPieAdornment || adornment is ChartPieAdornment3D;
-                var connectorAngle = isPie ? adornment.ConnectorRotationAngle : (6.28 * (1 - (adornment.ConnectorRotationAngle / 360.0)));
-                var points = GetAdornmentPositions(pieRadius, bounds, finalSize, adornment, labelIndex, pieLeft, pieRight, label, circularSeriesBase, ref x, ref y, connectorAngle, isPie);
-                DrawConnectorLine(labelIndex, points, connectorMode, true, adornment3D.ActualStartDepth);
-            }
-
-            if (!ShowLabel || double.IsNaN(y) || label == null) return;
-
-            double actualX = x + OffsetX;
-            double actualY = y + OffsetY;
-
-            // WPF-25838 To place the adornments little outer when half of the adornment is hidden.
-            if (LabelPosition == AdornmentsLabelPosition.Default && (Series is ColumnSeries3D || Series is BarSeries3D)
-                && !ShowConnectorLine && AdornmentsPosition != Charts.AdornmentsPosition.TopAndBottom)
-            {
-                var actualLabelPos = adornment.ActualLabelPosition;
-
-                switch (actualLabelPos)
-                {
-                    case ActualLabelPosition.Top:
-                        actualY = actualY - label.DesiredSize.Height / 2;
-                        break;
-                    case ActualLabelPosition.Left:
-                        actualX = actualX - label.DesiredSize.Width / 2;
-                        break;
-                    case ActualLabelPosition.Bottom:
-                        actualY = actualY + label.DesiredSize.Height / 2;
-                        break;
-                    case ActualLabelPosition.Right:
-                        actualX = actualX + label.DesiredSize.Width / 2;
-                        break;
-                }
-            }
-            else
-                AlignAdornmentLabelPosition3D(label, LabelPosition, ref actualX, ref actualY, labelIndex);
-
-            double seriesHeight = (Series is CircularSeriesBase3D)
-            ? (Series as CircularSeriesBase3D).Center.Y * 2 : series.IsActualTransposed
-            ? series.ActualXAxis.RenderedRect.Height : series.ActualYAxis.RenderedRect.Height;
-            var series3D = series as XyzDataSeries3D;
-            label.Visibility = Visibility.Visible;
-            if ((circularSeriesBase != null) || ((series is CartesianSeries3D) && series.ActualYAxis != null && seriesHeight >= actualY))
-                AddLabel(label, actualX, actualY, adornment3D.ActualStartDepth, labelIndex);
-            else if ((series is BarSeries3D) && series.ActualYAxis != null && seriesHeight >= actualY)
-                AddLabel(label, actualX, actualY, adornment3D.ActualStartDepth, labelIndex);
-            // Issue fix for the case of the adornment label not placed in horizontal axis or z axis is opposed.
-            else if ((series is CartesianSeries3D) && ((series.ActualYAxis != null && series.ActualYAxis.OpposedPosition) || (series3D != null && series3D.ActualZAxis != null && series3D.ActualZAxis.OpposedPosition)))
-                AddLabel(label, actualX, actualY, adornment3D.ActualStartDepth, labelIndex);
-        }
-
-        private double ModifyLeftToAngle(double x, UIElement element, int index)
-        {
-            var rotation = (this.Series.ActualArea as SfChart3D).ActualRotationAngle;
-            var tilt = (this.Series.ActualArea as SfChart3D).ActualTiltAngle;
-            var path = element as Path;
-
-            if (this.Series is ScatterSeries3D)
-            {
-                var scatterSeries = series as ScatterSeries3D;
-
-                var displaceScatterWidth = scatterSeries.IsTransposed ?
-                                           scatterSeries.ScatterHeight / 2 : scatterSeries.ScatterWidth / 2;
-                //No Seprate genearalization required for the depth axis.
-                if (tilt >= 45 && tilt < 315)
-                {
-                    if (rotation >= 135 && rotation < 225)
-                        return x + 1;
-                    else if (rotation >= 225 && rotation < 315)
-                        return x - 1 - displaceScatterWidth - (path != null ? 0 : element.DesiredSize.Width / 2);
-                    else if (rotation >= 45 && rotation < 135)
-                        return x + displaceScatterWidth + (path != null ? 0 : element.DesiredSize.Width / 2) + 1;
-                    else
-                        return x;
-                }
-                else
-                {
-                    if (rotation >= 135 && rotation < 225)
-                        return x + 1;
-                    else if (rotation >= 225 && rotation < 315)
-                        return x - 1 - displaceScatterWidth;
-                    else if (rotation >= 45 && rotation < 135)
-                        return x + displaceScatterWidth + 2;
-                    else
-                        return x;
-                }
-            }
-            else
-            {
-                if (tilt >= 45 && tilt < 315)
-                {
-                    if (rotation >= 135 && rotation < 225)
-                        return x + 1;
-                    else if (rotation >= 45 && rotation < 135)
-                    {
-                        if (this.Series.IsActualTransposed)
-                        {
-                            if (LabelPosition == AdornmentsLabelPosition.Inner)
-                                return x + (path != null ? 0 : element.DesiredSize.Width * 1.5);
-                            else
-                                return x + (path != null ? 0 : element.DesiredSize.Width / 2);
-                        }
-                        else
-                            return x + (path != null ? 0 : element.DesiredSize.Width / 2);
-                    }
-                    else if (rotation >= 225 && rotation < 315)
-                    {
-                        if (this.Series.IsActualTransposed)
-                        {
-                            if (LabelPosition == AdornmentsLabelPosition.Inner)
-                                return x - (path != null ? 0 : element.DesiredSize.Width * 1.5);
-                            else
-                                return x - (path != null ? 0 : element.DesiredSize.Width / 2);
-                        }
-                        else
-                            return x - (path != null ? 0 : element.DesiredSize.Width / 2);
-                    }
-                    else
-                        return x;
-                }
-                else
-                {
-                    if (rotation >= 135 && rotation < 225)
-                        return x + 1;
-                    else if (rotation >= 225 && rotation < 315)
-                        return x - 1;
-                    else if (rotation >= 45 && rotation < 135)
-                    {
-                        if (this.Series.IsActualTransposed)
-                        {
-                            if (LabelPosition == AdornmentsLabelPosition.Inner)
-                                return x + (path != null ? 0 : element.DesiredSize.Width) + 1;
-                            else
-                                return x + (path != null ? 0 : element.DesiredSize.Width / 2) + 5;
-                        }
-                        else
-                        {
-                            return x + 1;
-                        }
-                    }
-                    else
-                        return x;
-                }
-            }
-        }
-
-        private double ModifyDepthToAngle(double depth, UIElement element, int index)
-        {
-            var rotation = (this.Series.ActualArea as SfChart3D).ActualRotationAngle;
-            var tilt = (this.Series.ActualArea as SfChart3D).ActualTiltAngle;
-            var path = element as Path;
-
-            if (this.Series is ScatterSeries3D)
-            {
-                var scatterSeries = series as ScatterSeries3D;
-                ScatterSegment3D segment = series.Segments[index] as ScatterSegment3D;
-
-                if (!string.IsNullOrEmpty(scatterSeries.ZBindingPath))
-                {
-                    if (tilt >= 45 && tilt < 315)
-                    {
-                        if (rotation >= 135 && rotation < 225)
-                            return depth + segment.ScatterHeight * 1.5 + 1;
-                        else if (rotation >= 315 || rotation < 45)
-                            return depth - segment.ScatterHeight * 1.5;
-                        else
-                            return depth;
-                    }
-                    else
-                    {
-                        if (rotation >= 135 && rotation < 225)
-                            return depth + segment.ScatterHeight / 2 + 1;
-                        else if (rotation >= 315 || rotation < 45)
-                            return depth - segment.ScatterHeight / 2;
-                        else
-                            return depth;
-                    }
-                }
-                else
-                {
-                    if (tilt >= 45 && tilt < 315)
-                    {
-                        if (rotation >= 135 && rotation < 225)
-                            return (segment.startDepth + segment.ScatterHeight > segment.endDepth ? segment.endDepth : segment.startDepth + segment.ScatterHeight) + 1 + (path != null ? 0 : element.DesiredSize.Width / 2);
-                        else if (rotation >= 315 || rotation < 45)
-                            return depth - (path != null ? 0 : element.DesiredSize.Width / 2);
-                    }
-                    else
-                    {
-                        if (rotation >= 135 && rotation < 225)
-                            return (segment.startDepth + segment.ScatterHeight > segment.endDepth ? segment.endDepth : segment.startDepth + segment.ScatterHeight) + 1;
-                        else if (rotation >= 315 || rotation < 45)
-                            return depth;
-                    }
-                    return depth + ((segment.startDepth + segment.ScatterHeight > segment.endDepth ? segment.endDepth : segment.startDepth + segment.ScatterHeight) - segment.startDepth) / 2;
-                }
-            }
-            else
-            {
-                if (tilt >= 45 && tilt < 315)
-                {
-                    //Front.
-                    if ((rotation >= 0 && rotation < 45) || (rotation >= 315 && rotation < 360))
-                        return depth - (path != null ? 0 : element.DesiredSize.Height / 2);
-                    else if ((rotation >= 45 && rotation < 135) || (rotation >= 225 && rotation < 315))
-                        return depth;
-                    // Back.
-                    else
-                        return depth + (path != null ? 0 : element.DesiredSize.Height / 2);
-                }
-                else
-                {
-                    if ((rotation >= 0 && rotation < 45) || (rotation >= 315 && rotation < 360))
-                        return depth - 1;
-                    else if ((rotation >= 45 && rotation < 135) || (rotation >= 225 && rotation < 315))
-                        return depth;
-                    else
-                        return depth + 1;
-                }
-            }
-        }
-
-        #endregion
-
-        #endregion
-    }
 }

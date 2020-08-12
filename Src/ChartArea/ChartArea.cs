@@ -114,7 +114,7 @@ namespace Syncfusion.UI.Xaml.Charts
         /// <summary>
         /// The DependencyProperty for <see cref="TechnicalIndicators"/> property.
         /// </summary>
-        public static readonly DependencyProperty TechnicalIndicatorsProperty =
+        internal static readonly DependencyProperty TechnicalIndicatorsProperty =
             DependencyProperty.Register(
                 "TechnicalIndicators",
                 typeof(ObservableCollection<ChartSeries>), 
@@ -381,7 +381,7 @@ namespace Syncfusion.UI.Xaml.Charts
         /// <summary>
         /// Gets or sets technical indicators
         /// </summary>
-        public ObservableCollection<ChartSeries> TechnicalIndicators
+        internal ObservableCollection<ChartSeries> TechnicalIndicators
         {
             get { return (ObservableCollection<ChartSeries>)GetValue(TechnicalIndicatorsProperty); }
             set { SetValue(TechnicalIndicatorsProperty, value); }
@@ -481,10 +481,7 @@ namespace Syncfusion.UI.Xaml.Charts
         {
             get
             {
-                return VisibleSeries.Any(ser => ser.IsBitmapSeries)
-                       || (TechnicalIndicators != null && TechnicalIndicators.Any(indicator => indicator is MACDTechnicalIndicator
-                       && indicator.Visibility == Visibility.Visible
-                       && (indicator as MACDTechnicalIndicator).Type != MACDType.Line));
+                return VisibleSeries.Any(ser => ser.IsBitmapSeries);
             }
         }
 
@@ -2927,12 +2924,7 @@ namespace Syncfusion.UI.Xaml.Charts
                             if (!financialIndicator.YAxis.RegisteredSeries.Contains(financialIndicator))
                                 financialIndicator.YAxis.RegisteredSeries.Add(financialIndicator);
                         }
-                        else
-                        {
-                            if (!(financialIndicator is SimpleAverageIndicator || financialIndicator is TriangularAverageIndicator
-                                || financialIndicator is BollingerBandIndicator || financialIndicator is ExponentialAverageIndicator))
-                                financialIndicator.YAxis = new NumericalAxis() { OpposedPosition = true, RangePadding = NumericalPadding.Round };
-                        }
+
                         if (seriesPresenter != null && !seriesPresenter.Children.Contains(indicator))
                         {
                             seriesPresenter.Children.Add(indicator);
@@ -3064,9 +3056,6 @@ namespace Syncfusion.UI.Xaml.Charts
                         if (!indicator.YAxis.RegisteredSeries.Contains(indicator))
                             indicator.YAxis.RegisteredSeries.Add(indicator);
                     }
-                    else if (!(indicator is SimpleAverageIndicator || indicator is TriangularAverageIndicator
-                                || indicator is BollingerBandIndicator || indicator is ExponentialAverageIndicator))
-                        indicator.YAxis = new NumericalAxis() { OpposedPosition = true, RangePadding = NumericalPadding.Round };
                     if (this.seriesPresenter != null && !this.seriesPresenter.Children.Contains(indicator))
                     {
                         this.seriesPresenter.Children.Add(indicator);

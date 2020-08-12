@@ -807,7 +807,7 @@ namespace Syncfusion.UI.Xaml.Charts
             get
             {
                 return (ActualArea != null && ActualArea.ActualSeries.Count == 1 &&
-                   (ActualArea.ActualSeries[0] is AccumulationSeriesBase || ActualArea.ActualSeries[0] is CircularSeriesBase3D));
+                   (ActualArea.ActualSeries[0] is AccumulationSeriesBase));
             }
         }
 
@@ -971,7 +971,7 @@ namespace Syncfusion.UI.Xaml.Charts
         /// </summary>
         protected internal bool IsIndexed
         {
-            get { return this.ActualXAxis is CategoryAxis || ActualXAxis is CategoryAxis3D || this.ActualXAxis is DateTimeCategoryAxis; }
+            get { return this.ActualXAxis is CategoryAxis || this.ActualXAxis is DateTimeCategoryAxis; }
         }
 
         protected internal IList<Brush> ColorValues
@@ -1060,8 +1060,7 @@ namespace Syncfusion.UI.Xaml.Charts
                     }
                     else
                     {
-                        return (this as CartesianSeries3D).XAxis
-                               ?? ActualArea.InternalPrimaryAxis;
+                        return ActualArea.InternalPrimaryAxis;
                     }
                 }
                 else
@@ -1087,8 +1086,7 @@ namespace Syncfusion.UI.Xaml.Charts
                     }
                     else
                     {
-                        return (this as CartesianSeries3D).YAxis
-                               ?? ActualArea.InternalSecondaryAxis;
+                        return ActualArea.InternalSecondaryAxis;
                     }
                 }
                 else
@@ -1164,7 +1162,7 @@ namespace Syncfusion.UI.Xaml.Charts
                     if (ActualSeriesYValues.Count() > 0)
                     {
                         if (!(this is StackingColumn100Series) && ActualXAxis is CategoryAxis && !(ActualXAxis as CategoryAxis).IsIndexed
-                            && !(this is WaterfallSeries) && !(this is ErrorBarSeries) || ActualXAxis is CategoryAxis3D && !(ActualXAxis as CategoryAxis3D).IsIndexed)
+                            && !(this is WaterfallSeries) && !(this is ErrorBarSeries))
                         {
                             var count = (this is RangeSeriesBase) ? (this as RangeSeriesBase).GroupedSeriesYValues[0].Count :
                             (this is FinancialSeriesBase) ? (this as FinancialSeriesBase).GroupedSeriesYValues[0].Count :
@@ -1879,11 +1877,6 @@ namespace Syncfusion.UI.Xaml.Charts
                 else
                     selectionChangedEventArgs.NewPointInfo = ActualData[selectionChangedEventArgs.SelectedIndex];
             }
-            else if (this is ChartSeries3D)
-            {
-                selectionChangedEventArgs.SelectedIndex = (this as ChartSeries3D).SelectedIndex;
-                selectionChangedEventArgs.NewPointInfo = Segments[selectionChangedEventArgs.SelectedIndex].Item;
-            }
 
             selectionChangedEventArgs.SelectedSeries = this;
             selectionChangedEventArgs.PreviousSelectedIndex = -1;
@@ -2582,19 +2575,6 @@ namespace Syncfusion.UI.Xaml.Charts
                             SeriesYValues[i].RemoveAt(e.OldStartingIndex);
                         }
 
-                        var xyzDataSeries3D = this as XyzDataSeries3D;
-                        if (xyzDataSeries3D != null && xyzDataSeries3D.ZValues != null && xyzDataSeries3D.ZValues.GetEnumerator().MoveNext())
-                        {
-                            if (xyzDataSeries3D.ZValues is IList<double>)
-                            {
-                                (xyzDataSeries3D.ZValues as IList<double>).RemoveAt(e.OldStartingIndex);
-                            }
-                            else if (xyzDataSeries3D.ZValues is IList<string>)
-                            {
-                                (xyzDataSeries3D.ZValues as IList<string>).RemoveAt(e.OldStartingIndex);
-                            }
-                        }
-
                         if (IsSortData)
                         {
                             SortActualPoints();
@@ -2724,8 +2704,7 @@ namespace Syncfusion.UI.Xaml.Charts
                     ActualArea.IsUpdateLegend = true;
                 }
 
-                int index = (this is ISegmentSelectable) ? (this as ISegmentSelectable).SelectedIndex
-                    : this is ChartSeries3D ? (this as ChartSeries3D).SelectedIndex : -1;
+                int index = (this is ISegmentSelectable) ? (this as ISegmentSelectable).SelectedIndex : -1;
 
                 if (triggerSelectionChangedEventOnLoad && index >= 0 && this.DataCount > index)
                     RaiseSelectionChangedEvent();
@@ -3213,8 +3192,7 @@ namespace Syncfusion.UI.Xaml.Charts
                 {
                     if (accumulationSeries != null)
                         yvalues.Add(accumulationSeries.YValues[i]);
-                    else
-                        yvalues.Add((this as CircularSeriesBase3D).YValues[i]);
+                    
                 }
                 else
                     yvalues.Add(double.NaN);
@@ -3427,19 +3405,15 @@ namespace Syncfusion.UI.Xaml.Charts
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Performance", "CA1800:DoNotCastUnnecessarily")]
         internal void CalculateSideBySideInfoPadding(double minWidth, int all, int pos, bool isXAxis)
         {
-            var xyzDataSeries = this as XyzDataSeries3D;
-            var axis = isXAxis ? this.ActualXAxis : xyzDataSeries.ActualZAxis;
+            var axis =  this.ActualXAxis;
             bool isAlterRange = ((axis is NumericalAxis && (axis as NumericalAxis).RangePadding == NumericalPadding.None)
-                    || (axis is DateTimeAxis && (axis as DateTimeAxis).RangePadding == DateTimeRangePadding.None) || (axis is NumericalAxis3D && (axis as NumericalAxis3D).RangePadding == NumericalPadding.None)
-                    || (axis is DateTimeAxis3D && (axis as DateTimeAxis3D).RangePadding == DateTimeRangePadding.None));
+                    || (axis is DateTimeAxis && (axis as DateTimeAxis).RangePadding == DateTimeRangePadding.None));
             double space = isAlterRange ? 1 - ChartSeriesBase.GetSpacing(this) : ChartSeriesBase.GetSpacing(this);
             double div = minWidth * space / all;
             double padStart = div * (pos - 1) - minWidth * space / 2;
             double padEnd = padStart + div;
-            if (isXAxis)
-                SideBySideInfoRangePad = new DoubleRange(padStart, padEnd);
-            else
-                xyzDataSeries.ZSideBySideInfoRangePad = new DoubleRange(padStart, padEnd);
+            SideBySideInfoRangePad = new DoubleRange(padStart, padEnd);
+  
         }
 
         /// <summary>
@@ -3487,12 +3461,12 @@ namespace Syncfusion.UI.Xaml.Charts
                     var filteredSeries = (from series in this is ChartSeries ? seriesCollection.Union(technicalIndicators) : seriesCollection
                                           let rowPos =
                                               series.IsActualTransposed
-                                                  ? isXAxis ? ActualArea.GetActualRow(series.ActualXAxis) : ActualArea.GetActualRow((series as XyzDataSeries3D).ActualZAxis)
+                                                  ?  ActualArea.GetActualRow(series.ActualXAxis)
                                                   : ActualArea.GetActualRow(series.ActualYAxis)
                                           let columnPos =
                                               series.IsActualTransposed
                                                   ? ActualArea.GetActualColumn(series.ActualYAxis)
-                                                  : isXAxis ? ActualArea.GetActualColumn(series.ActualXAxis) : ActualArea.GetActualColumn((series as XyzDataSeries3D).ActualZAxis)
+                                                  : ActualArea.GetActualColumn(series.ActualXAxis)
                                           where columnPos == j && rowPos == i
                                           select series).ToList();
 
@@ -3513,8 +3487,7 @@ namespace Syncfusion.UI.Xaml.Charts
                                     continue;
                                 }
 
-                                foreach (var stackedColumn in stackedColumns.Where(stackedColumn => (stackedColumn.ActualYAxis == item.ActualYAxis) && ((stackedColumn is StackingSeriesBase) ? ((stackedColumn as StackingSeriesBase).GroupingLabel == (item as StackingSeriesBase).GroupingLabel) :
-                                    ((stackedColumn as StackingSeriesBase3D).GroupingLabel == (item as StackingSeriesBase3D).GroupingLabel))))
+                                foreach (var stackedColumn in stackedColumns.Where(stackedColumn => (stackedColumn.ActualYAxis == item.ActualYAxis) && ( ((stackedColumn as StackingSeriesBase).GroupingLabel == (item as StackingSeriesBase).GroupingLabel))))
                                 {
                                     stacked = true;
                                     currStack = ActualArea.SeriesPosition[stackedColumn];
@@ -3750,6 +3723,8 @@ namespace Syncfusion.UI.Xaml.Charts
         internal void UpdateEmptyPoints(int index)
         {
             if (EmptyPointIndexes != null && EmptyPointIndexes.Count() > 0 && ActualArea is SfChart && (ActualArea as SfChart).Series != null && (ActualArea as SfChart).Series.Count > 0)
+            {
+
                 foreach (var emptyPointIndex in EmptyPointIndexes[0])
                 {
                     if (emptyPointIndex == index)
@@ -3759,16 +3734,8 @@ namespace Syncfusion.UI.Xaml.Charts
                         break;
                     }
                 }
-            else if (EmptyPointIndexes != null && EmptyPointIndexes.Count() > 0 && ActualArea is SfChart3D && (ActualArea as SfChart3D).Series != null && (ActualArea as SfChart3D).Series.Count > 0)
-                foreach (var emptyPointIndex in EmptyPointIndexes[0])
-                {
-                    if (emptyPointIndex == index)
-                    {
-                        EmptyPointIndexes[0].Remove(emptyPointIndex);
-                        Segments[index].IsEmptySegmentInterior = false;
-                        break;
-                    }
-                }
+            }
+            
         }
 
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Performance", "CA1800:DoNotCastUnnecessarily")]
@@ -4725,7 +4692,7 @@ namespace Syncfusion.UI.Xaml.Charts
 
                 return rangeTooltipTemplate;
             }
-            else if (this is LineSeries || this is SplineSeries || this is LineSeries3D || this is FastLineBitmapSeries
+            else if (this is LineSeries || this is SplineSeries  || this is FastLineBitmapSeries
                 || this is FastLineSeries || this is FastStepLineBitmapSeries)
             {
                 if (lineTooltipTemplate == null)
@@ -5018,11 +4985,8 @@ namespace Syncfusion.UI.Xaml.Charts
             }
             else if (instance != null && instance.ActualArea != null && instance.ActualArea.Tooltip != null)
             {
-                Canvas canvas;
-                if (instance.ActualArea is SfChart)
-                    canvas = (instance.ActualArea as SfChart).GetAdorningCanvas();
-                else
-                    canvas = (instance.ActualArea as SfChart3D).GetAdorningCanvas();
+                Canvas canvas = (instance.ActualArea as SfChart).GetAdorningCanvas();
+
                 if (canvas != null && canvas.Children.Contains((instance.ActualArea.Tooltip as ChartTooltip)))
                     canvas.Children.Remove(instance.ActualArea.Tooltip as ChartTooltip);
             }
@@ -5038,9 +5002,7 @@ namespace Syncfusion.UI.Xaml.Charts
 
         private static void OnLabelPropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
-            var series3D = (d as XyDataSeries3D);
-            if (series3D != null)
-                series3D.OnLabelPropertyChanged();
+
         }
 
         private static void OnVisibilityOnLegendChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
@@ -5304,7 +5266,7 @@ namespace Syncfusion.UI.Xaml.Charts
 
         private void OnActualTransposeChanged()
         {
-            if ((this is CartesianSeries || this is CartesianSeries3D) && this.ActualXAxis != null && this.ActualYAxis != null)
+            if ((this is CartesianSeries) && this.ActualXAxis != null && this.ActualYAxis != null)
             {
                 this.ActualXAxis.Orientation = IsActualTransposed ? Orientation.Vertical : Orientation.Horizontal;
                 this.ActualYAxis.Orientation = IsActualTransposed ? Orientation.Horizontal : Orientation.Vertical;
@@ -5589,16 +5551,13 @@ namespace Syncfusion.UI.Xaml.Charts
                 return;
             }
 
-            var xyzDataSeries3D = this as XyzDataSeries3D;
-            if (IsComplexYProperty || XBindingPath.Contains(".")
-                || (xyzDataSeries3D != null && xyzDataSeries3D.ZBindingPath.Contains(".")))
+            if (IsComplexYProperty || XBindingPath.Contains("."))
             {
                 ComplexPropertyChanged(sender, e);
             }
             else
                 if (XBindingPath == e.PropertyName
                     || YPaths != null && YPaths.Contains(e.PropertyName) || SegmentColorPath == e.PropertyName
-                    || (this is XyzDataSeries3D && (this as XyzDataSeries3D).ZBindingPath == e.PropertyName)
                     || (this is WaterfallSeries && (this as WaterfallSeries).SummaryBindingPath == e.PropertyName))
             {
                 int position = -1;
@@ -5643,13 +5602,6 @@ namespace Syncfusion.UI.Xaml.Charts
                         paths = YComplexPaths[i];
                     break;
                 }
-            }
-
-            var xyzDataSeries3D = this as XyzDataSeries3D;
-            if (xyzDataSeries3D != null && xyzDataSeries3D.ZBindingPath.Contains(e.PropertyName))
-            {
-                isZPath = true;
-                paths = xyzDataSeries3D.ZComplexPaths;
             }
 
             if (XBindingPath.Contains(e.PropertyName) || isYPath
@@ -6032,7 +5984,7 @@ namespace Syncfusion.UI.Xaml.Charts
 
         private void OnAppearanceChanged(ChartSeriesBase obj)
         {
-            if (IsBitmapSeries || this is ChartSeries3D || (SegmentColorPath != null && IsColorPathSeries))
+            if (IsBitmapSeries || (SegmentColorPath != null && IsColorPathSeries))
                 obj.UpdateArea();
             else if (obj.adornmentInfo != null)
                 obj.adornmentInfo.UpdateLabels(); // WPF-19938 - UseSeriesPalette not updated when series interior is changed

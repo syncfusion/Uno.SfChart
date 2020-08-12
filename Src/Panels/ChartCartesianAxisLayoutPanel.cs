@@ -192,9 +192,7 @@ namespace Syncfusion.UI.Xaml.Charts
 
                 if (content.Orientation == Orientation.Horizontal)
                 {
-                    var chartAxisBase3D = content as ChartAxisBase3D;
-                    if (chartAxisBase3D != null && PreventAxisAddition(chartAxisBase3D))
-                        continue;
+                    
                     Area.ColumnDefinitions[Area.GetActualColumn(content)].Axis.Add(content);
                 }
                 else
@@ -312,16 +310,6 @@ namespace Syncfusion.UI.Xaml.Charts
                 {
                     panel.Children.Add(content);
                 }
-
-                //To make the initialized depth axis as manhattan depth axis.
-                var chartAxisBase3D = content as ChartAxisBase3D;
-                if (chartAxisBase3D != null)
-                {
-                    if (ChartCartesianAxisLayoutPanel.IsDeclaredSeriesManhattan(content.Area.VisibleSeries, chartAxisBase3D))
-                        chartAxisBase3D.IsManhattanAxis = true;
-                    else
-                        chartAxisBase3D.IsManhattanAxis = false;
-                }
             }
         }
 
@@ -366,30 +354,10 @@ namespace Syncfusion.UI.Xaml.Charts
 
         #region Private Static Methods
 
-        /// <summary>
-        /// Check whether the declared series is manhattan.
-        /// </summary>
-        /// <param name="visibleSeries">The Visible Series</param>
-        /// <param name="axis3D">The 3D Axis</param>
-        /// <returns>Returns a value indicating whether the declared series is manhattan.</returns>
-        private static bool IsDeclaredSeriesManhattan(ChartVisibleSeriesCollection visibleSeries, ChartAxisBase3D axis3D)
-        {
-            return axis3D.IsZAxis && visibleSeries.Count > 0 && visibleSeries.All(series => (series is AreaSeries3D || series is LineSeries3D));
-        }
 
         #endregion
 
         #region Private Methods
-
-        /// <summary>
-        /// Prevents the axis addition.
-        /// </summary>
-        /// <param name="axis3D">The 3D Axis</param>
-        /// <returns>Returns a value indicating wehter axis to be added in the axis collection.</returns>
-        private bool PreventAxisAddition(ChartAxisBase3D axis3D)
-        {
-            return (axis3D.IsManhattanAxis && Area.VisibleSeries != null && Area.VisibleSeries.Count == 1);
-        }
 
         /// <summary>
         /// Spanning Calculation for each axis.
@@ -480,18 +448,6 @@ namespace Syncfusion.UI.Xaml.Charts
                         var columnSize = new Size(column.ComputedWidth, availableSize.Height);
                         column.Measure(columnSize, bottomSizes, topSizes);
 
-                        //This is the place where the column is updated correctly just before the y axis and x axis arrangement.
-                        if (Area is SfChart3D)
-                        {
-                            if ((column.Axis.Any(x => (x as ChartAxisBase3D).IsZAxis && !(x as ChartAxisBase3D).IsManhattanAxis)))
-                            {
-                                (Area as SfChart3D).ActualDepth = column.ComputedWidth;
-                            }
-                            else
-                            {
-                                (Area as SfChart3D).ActualDepth = (Area as SfChart3D).Depth;
-                            }
-                        }
                     }
 
                     left = leftSizes.Sum();

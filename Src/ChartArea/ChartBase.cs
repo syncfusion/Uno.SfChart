@@ -1274,8 +1274,6 @@ namespace Syncfusion.UI.Xaml.Charts
         {
             if (this is SfChart && SelectionBehaviour != null)
                 return SelectionBehaviour.GetSeriesSelectionBrush(series);
-            else if (series is ChartSeries3D)
-                return (series as ChartSeries3D).GetSeriesSelectionBrush(series);
 
             return null;
         }
@@ -1289,8 +1287,6 @@ namespace Syncfusion.UI.Xaml.Charts
         {
             if (this is SfChart && SelectionBehaviour != null)
                 return SelectionBehaviour.EnableSeriesSelection;
-            else if (this is SfChart3D)
-                return (this as SfChart3D).EnableSeriesSelection;
 
             return false;
         }
@@ -1304,8 +1300,6 @@ namespace Syncfusion.UI.Xaml.Charts
         {
             if (this is SfChart && SelectionBehaviour != null)
                 return SelectionBehaviour.EnableSegmentSelection;
-            else if (this is SfChart3D)
-                return (this as SfChart3D).EnableSegmentSelection;
 
             return false;
         }
@@ -1370,9 +1364,7 @@ namespace Syncfusion.UI.Xaml.Charts
         internal void RaiseSeriesSelectionChangedEvent()
         {
             ChartSeriesBase series = null;
-            if ((this is SfChart3D) && (SeriesSelectedIndex < (this as SfChart3D).Series.Count))
-                series = (this as SfChart3D).Series[this.SeriesSelectedIndex] as ChartSeriesBase;
-            else if (SeriesSelectedIndex < (this as SfChart).Series.Count)
+            if (SeriesSelectedIndex < (this as SfChart).Series.Count)
                 series = (this as SfChart).Series[this.SeriesSelectedIndex] as ChartSeriesBase;
             OnSelectionChanged(new ChartSelectionChangedEventArgs()
             {
@@ -1408,11 +1400,6 @@ namespace Syncfusion.UI.Xaml.Charts
                     SelectionChanged(this, eventArgs);
 
                 SelectionBehaviour.OnSelectionChanged(eventArgs);
-            }
-            else if (this is SfChart3D)
-            {
-                if (SelectionChanged != null && eventArgs != null)
-                    SelectionChanged(this, eventArgs);
             }
         }
 

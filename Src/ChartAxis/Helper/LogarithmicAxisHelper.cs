@@ -93,36 +93,6 @@ namespace Syncfusion.UI.Xaml.Charts
         /// <param name="actualInterval">The actual interval.</param>
         internal static void GenerateVisibleLabels3D(ChartAxis axis, object minimum, object maximum, object actualInterval, double logBase)
         {
-            double interval = axis.VisibleInterval;
-
-            double position;
-            if ((minimum != null && maximum != null && actualInterval != null)
-                || axis.EdgeLabelsVisibilityMode == EdgeLabelsVisibilityMode.AlwaysVisible
-                || (axis.EdgeLabelsVisibilityMode == EdgeLabelsVisibilityMode.Visible))
-                position = axis.VisibleRange.Start;
-            else
-                position = axis.VisibleRange.Start - (axis.VisibleRange.Start % axis.ActualInterval);
-
-            for (; position <= axis.VisibleRange.End; position += interval)
-            {
-                if (axis.VisibleRange.Inside(position))
-                {
-                    axis.VisibleLabels.Add(new ChartAxisLabel(position, axis.GetLabelContent(Math.Pow(logBase, position)), position));
-                }
-
-                if (axis.smallTicksRequired)
-                {
-                    axis.AddSmallTicksPoint(position, (axis as LogarithmicAxis3D).LogarithmicBase);
-                }
-            }
-
-            if (((maximum != null && axis.VisibleRange.End.Equals(maximum))
-                || axis.EdgeLabelsVisibilityMode == EdgeLabelsVisibilityMode.AlwaysVisible
-                || (axis.EdgeLabelsVisibilityMode == EdgeLabelsVisibilityMode.Visible))
-                    && !axis.VisibleRange.End.Equals(position - interval))
-            {
-                axis.VisibleLabels.Add(new ChartAxisLabel(axis.VisibleRange.End, axis.GetLabelContent(Math.Pow(logBase, axis.VisibleRange.End)), axis.VisibleRange.End));
-            }
         }
 
         /// <summary>

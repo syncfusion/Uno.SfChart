@@ -105,61 +105,7 @@ namespace Syncfusion.UI.Xaml.Charts
         /// Method implementation for Create VisibleLabels for DateTime axis
         internal static void GenerateVisibleLabels3D(ChartAxis axis, object minimum, object maximum, DateTimeIntervalType intervalType)
         {
-            var startDate = axis.VisibleRange.Start.FromOADate();
-            DateTime alignedDate;
-            var interval = IncreaseInterval(startDate, axis.VisibleInterval, intervalType).ToOADate() - axis.VisibleRange.Start;
-
-            if (axis.EdgeLabelsVisibilityMode == EdgeLabelsVisibilityMode.AlwaysVisible
-               || axis.EdgeLabelsVisibilityMode == EdgeLabelsVisibilityMode.Visible)
-                alignedDate = startDate;
-            else
-                alignedDate = AlignRangeStart(startDate, axis.VisibleInterval, intervalType);
-
-            var dateTimeAxis = axis as DateTimeAxis;
-            var days = "";
-            double distinctDate = 0d;
-            double position = alignedDate.ToOADate();
-            if (dateTimeAxis != null && dateTimeAxis.EnableBusinessHours)
-            {
-                days = dateTimeAxis.InternalWorkingDays;
-                alignedDate = new DateTime(startDate.Year, startDate.Month, startDate.Day).AddHours(dateTimeAxis.OpenTime);
-                position = alignedDate.ToOADate();
-            }
-
-            var dateTimeAxis3D = axis as DateTimeAxis3D;
-
-            while (position <= axis.VisibleRange.End)
-            {
-                if (axis.VisibleRange.Inside(position))
-                {
-                    var dateTimeAxisLabel = new DateTimeAxisLabel(position, alignedDate.ToString(axis.LabelFormat, CultureInfo.CurrentCulture), position);
-                    dateTimeAxisLabel.IntervalType = dateTimeAxis3D.ActualIntervalType3D;
-                    dateTimeAxisLabel.IsTransition = GetTransitionState(ref distinctDate, alignedDate, dateTimeAxis3D.ActualIntervalType3D);
-                    axis.VisibleLabels.Add(dateTimeAxisLabel);
-                }
-
-                alignedDate = IncreaseNonWorkingInterval(days, dateTimeAxis, alignedDate, axis.VisibleInterval, intervalType);
-                if (dateTimeAxis != null && dateTimeAxis.EnableBusinessHours)
-                    alignedDate = NonWorkingDaysIntervals(dateTimeAxis, alignedDate, interval, intervalType);
-
-                if (axis.smallTicksRequired)
-                {
-                    axis.AddSmallTicksPoint(position, interval);
-                }
-
-                position = alignedDate.ToOADate();
-            }
-
-            if (((maximum != null && axis.VisibleRange.End.FromOADate().Equals(maximum))
-                || axis.EdgeLabelsVisibilityMode == EdgeLabelsVisibilityMode.AlwaysVisible
-                || axis.EdgeLabelsVisibilityMode == EdgeLabelsVisibilityMode.Visible)
-                && !axis.VisibleRange.End.Equals(position - interval))
-            {
-                var dateTimeAxisLabel = new DateTimeAxisLabel(position, alignedDate.ToString(axis.LabelFormat, CultureInfo.CurrentCulture), position);
-                dateTimeAxisLabel.IntervalType = dateTimeAxis3D.ActualIntervalType3D;
-                dateTimeAxisLabel.IsTransition = GetTransitionState(ref distinctDate, alignedDate, dateTimeAxis3D.ActualIntervalType3D);
-                axis.VisibleLabels.Add(dateTimeAxisLabel);
-            }
+            
         }
 
         /// <summary>

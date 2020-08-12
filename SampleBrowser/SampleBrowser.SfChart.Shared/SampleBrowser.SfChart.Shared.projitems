@@ -43,6 +43,9 @@
     <Compile Include="$(MSBuildThisFileDirectory)View\BubbleChartView.xaml.cs">
       <DependentUpon>BubbleChartView.xaml</DependentUpon>
     </Compile>
+    <Compile Include="$(MSBuildThisFileDirectory)View\ChartAxisType.xaml.cs">
+      <DependentUpon>ChartAxisType.xaml</DependentUpon>
+    </Compile>
     <Compile Include="$(MSBuildThisFileDirectory)View\ColumnChartView.xaml.cs">
       <DependentUpon>ColumnChartView.xaml</DependentUpon>
     </Compile>
@@ -71,6 +74,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="$(MSBuildThisFileDirectory)View\BubbleChartView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="$(MSBuildThisFileDirectory)View\ChartAxisType.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

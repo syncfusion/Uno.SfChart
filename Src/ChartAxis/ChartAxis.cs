@@ -759,17 +759,9 @@ namespace Syncfusion.UI.Xaml.Charts
                 arrangeRect = value;
                 if (Orientation == Orientation.Horizontal)
                 {
-                    var axis = (this as ChartAxisBase3D);
                     double width = Math.Max(0, arrangeRect.Width - (ActualPlotOffset * 2));
 
-                    if ((axis != null && axis.IsZAxis))
-                    {
-                        RenderedRect = new Rect(ActualPlotOffset, arrangeRect.Top, width, arrangeRect.Height);
-                    }
-                    else
-                    {
-                        RenderedRect = new Rect(arrangeRect.Left + ActualPlotOffset, arrangeRect.Top, width, arrangeRect.Height);
-                    }
+                    RenderedRect = new Rect(arrangeRect.Left + ActualPlotOffset, arrangeRect.Top, width, arrangeRect.Height);
                 }
                 else
                 {
@@ -1991,9 +1983,6 @@ namespace Syncfusion.UI.Xaml.Charts
                             if (series.ActualYAxis == this)
                                 return series.YRange;
 
-                            var xyzDataSeries3D = series as XyzDataSeries3D;
-                            if (xyzDataSeries3D != null && xyzDataSeries3D.ActualZAxis == this)
-                                return xyzDataSeries3D.ZRange;
                             return DoubleRange.Empty;
                         }
                     ).Sum();
@@ -2111,21 +2100,6 @@ namespace Syncfusion.UI.Xaml.Charts
                         yAxis.associatedAxes.Add(xAxis);
                     }
 
-                    var chartAxisBase3D = this as ChartAxisBase3D;
-                    if (chartAxisBase3D != null && chartAxisBase3D.IsZAxis)
-                    {
-                        ChartAxis zAxis = this;
-
-                        if (zAxis.associatedAxes != null && !zAxis.associatedAxes.Contains(yAxis))
-                        {
-                            CheckAxes(zAxis);
-
-                            if (xAxis.Orientation == Orientation.Vertical)
-                                zAxis.associatedAxes.Add(xAxis);
-                            else
-                                zAxis.associatedAxes.Add(yAxis);
-                        }
-                    }
                 }
 
                 ScheduleCheck();
@@ -2138,7 +2112,7 @@ namespace Syncfusion.UI.Xaml.Charts
                 var xAxis = series.ActualXAxis;
                 if (Area != null && xAxis != null && yAxis != null && xAxis.associatedAxes != null && yAxis.associatedAxes != null)
                 {
-                    if (Area is SfChart3D || series is FinancialTechnicalIndicator
+                    if (series is FinancialTechnicalIndicator
                         || xAxis.Equals(Area.InternalPrimaryAxis) || yAxis.Equals(Area.InternalSecondaryAxis))
                     {
                         if (!Area.Axes.Contains(yAxis))
@@ -2185,14 +2159,7 @@ namespace Syncfusion.UI.Xaml.Charts
                             foreach (ChartSeries chartSeries in technicalIndicatorCollection)
                                 RemoveAssociatedAxis(chartSeries.ActualXAxis, chartSeries.ActualYAxis);
                     }
-                    else
-                    {
-                        ChartSeries3DCollection seriesCollection = (Area as SfChart3D).Series;
 
-                        if (seriesCollection != null)
-                            foreach (ChartSeries3D chartSeries in seriesCollection)
-                                RemoveAssociatedAxis(chartSeries.ActualXAxis, chartSeries.ActualYAxis);
-                    }
                 }
             }
         }
@@ -2442,35 +2409,22 @@ namespace Syncfusion.UI.Xaml.Charts
         {
             if (Area != null && Area.GridLinesLayout != null)
             {
-                if (this is ChartAxisBase3D)
+
+
+                if (!value && GridLinesRecycler != null)
                 {
-                    if (!value && GridLinesRecycler != null)
+                    GridLinesRecycler.Clear();
+                }
+                else if (value && VisibleLabels.Count > 0)
+                {
+                    if (!double.IsInfinity(Area.AvailableSize.Height) && !double.IsInfinity(Area.AvailableSize.Width))
                     {
-                        for (int i = 0; i < GridLinesRecycler.Count; i++)
-                            (GridLinesRecycler[i] as Line).Visibility = Visibility.Collapsed;
-                    }
-                    else if (value && VisibleLabels.Count > 0)
-                    {
-                        for (int i = 0; i < GridLinesRecycler.Count; i++)
-                            (GridLinesRecycler[i] as Line).Visibility = Visibility.Visible;
+                        Area.GridLinesLayout.UpdateElements();
+                        Area.GridLinesLayout.Measure(Area.AvailableSize);
+                        Area.GridLinesLayout.Arrange(Area.AvailableSize);
                     }
                 }
-                else
-                {
-                    if (!value && GridLinesRecycler != null)
-                    {
-                        GridLinesRecycler.Clear();
-                    }
-                    else if (value && VisibleLabels.Count > 0)
-                    {
-                        if (!double.IsInfinity(Area.AvailableSize.Height) && !double.IsInfinity(Area.AvailableSize.Width))
-                        {
-                            Area.GridLinesLayout.UpdateElements();
-                            Area.GridLinesLayout.Measure(Area.AvailableSize);
-                            Area.GridLinesLayout.Arrange(Area.AvailableSize);
-                        }
-                    }
-                }
+                
             }
         }
 

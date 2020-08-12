@@ -95,16 +95,6 @@ namespace Syncfusion.UI.Xaml.Charts
             return new Rect(rect.X + x, rect.Y + y, rect.Width - x, rect.Height - y);
         }
 
-        internal static List<Vector3D> Get3DVector(this List<Point> points, double depth)
-        {
-            var vector3D = new List<Vector3D>();
-            foreach (var point in points)
-            {
-                vector3D.Add(new Vector3D(point, depth));
-            }
-            return vector3D;
-        }
-
         public static IEnumerable<TSource> DistinctBy<TSource, TKey>
            (this IEnumerable<TSource> source, Func<TSource, TKey> keySelector)
         {

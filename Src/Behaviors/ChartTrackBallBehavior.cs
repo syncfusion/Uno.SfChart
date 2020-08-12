@@ -2233,45 +2233,26 @@ namespace Syncfusion.UI.Xaml.Charts
             DataTemplate trackBallLabelTemplate = null;
 
             var technicalIndicator = (from indicator in ChartArea.TechnicalIndicators where indicator.ItemsSource == pointInfo.Series.ItemsSource select indicator as FinancialTechnicalIndicator).FirstOrDefault();
-            if (pointInfo.Series is FinancialSeriesBase && technicalIndicator != null && technicalIndicator.ShowTrackballInfo)
+
+
+            if (pointInfo.Series is FinancialSeriesBase && LabelDisplayMode != TrackballLabelDisplayMode.NearestPoint)
+                pointInfo.Series.ActualTrackBallLabelTemplate = ChartDictionaries.GenericCommonDictionary["defaultFinancialTrackBallLabel"] as DataTemplate;
+            else if (pointInfo.Series is RangeSeriesBase && LabelDisplayMode != TrackballLabelDisplayMode.NearestPoint)
             {
-                var macdTechnicalIndicator = technicalIndicator as MACDTechnicalIndicator;
-                if (technicalIndicator is BollingerBandIndicator)
-                    pointInfo.Series.ActualTrackBallLabelTemplate = ChartDictionaries.GenericCommonDictionary["bollingerBandTrackBallLabel"] as DataTemplate;
-                else if (technicalIndicator is StochasticTechnicalIndicator)
-                    pointInfo.Series.ActualTrackBallLabelTemplate = ChartDictionaries.GenericCommonDictionary["stochasticTrackBallLabel"] as DataTemplate;
-                else if (macdTechnicalIndicator != null)
+                if (pointInfo.Series is RangeColumnSeries && !pointInfo.Series.IsMultipleYPathRequired)
                 {
-                    if (macdTechnicalIndicator.Type == MACDType.Both)
-                        pointInfo.Series.ActualTrackBallLabelTemplate = ChartDictionaries.GenericCommonDictionary["macd_both_TrackBallLabel"] as DataTemplate;
-                    if (macdTechnicalIndicator.Type == MACDType.Line)
-                        pointInfo.Series.ActualTrackBallLabelTemplate = ChartDictionaries.GenericCommonDictionary["macd_line_TrackBallLabel"] as DataTemplate;
-                    if (macdTechnicalIndicator.Type == MACDType.Histogram)
-                        pointInfo.Series.ActualTrackBallLabelTemplate = ChartDictionaries.GenericCommonDictionary["macd_histogram_TrackBallLabel"] as DataTemplate;
-                }
-                else
-                    pointInfo.Series.ActualTrackBallLabelTemplate = ChartDictionaries.GenericCommonDictionary["defaultIndicatorTrackBallLabel"] as DataTemplate;
-            }
-            else
-            {
-                if (pointInfo.Series is FinancialSeriesBase && LabelDisplayMode != TrackballLabelDisplayMode.NearestPoint)
-                    pointInfo.Series.ActualTrackBallLabelTemplate = ChartDictionaries.GenericCommonDictionary["defaultFinancialTrackBallLabel"] as DataTemplate;
-                else if (pointInfo.Series is RangeSeriesBase && LabelDisplayMode != TrackballLabelDisplayMode.NearestPoint)
-                {
-                    if (pointInfo.Series is RangeColumnSeries && !pointInfo.Series.IsMultipleYPathRequired)
-                    {
-                        pointInfo.Series.ActualTrackBallLabelTemplate = ChartDictionaries.GenericCommonDictionary["defaultTrackBallLabel"] as DataTemplate;
-                    }
-                    else
-                    {
-                        pointInfo.Series.ActualTrackBallLabelTemplate = ChartDictionaries.GenericCommonDictionary["rangeSeriesTrackBallLabel"] as DataTemplate;
-                    }
-                }
-                else if (pointInfo.Series is BoxAndWhiskerSeries && LabelDisplayMode != TrackballLabelDisplayMode.NearestPoint && !pointInfo.isOutlier)
-                    pointInfo.Series.ActualTrackBallLabelTemplate = ChartDictionaries.GenericCommonDictionary["BoxWhiskerTrackBallLabel"] as DataTemplate;
-                else
                     pointInfo.Series.ActualTrackBallLabelTemplate = ChartDictionaries.GenericCommonDictionary["defaultTrackBallLabel"] as DataTemplate;
+                }
+                else
+                {
+                    pointInfo.Series.ActualTrackBallLabelTemplate = ChartDictionaries.GenericCommonDictionary["rangeSeriesTrackBallLabel"] as DataTemplate;
+                }
             }
+            else if (pointInfo.Series is BoxAndWhiskerSeries && LabelDisplayMode != TrackballLabelDisplayMode.NearestPoint && !pointInfo.isOutlier)
+                pointInfo.Series.ActualTrackBallLabelTemplate = ChartDictionaries.GenericCommonDictionary["BoxWhiskerTrackBallLabel"] as DataTemplate;
+            else
+                pointInfo.Series.ActualTrackBallLabelTemplate = ChartDictionaries.GenericCommonDictionary["defaultTrackBallLabel"] as DataTemplate;
+            
 
             if ((pointInfo.Series.TrackBallLabelTemplate != null && UseSeriesPalette && pointInfo.Series.Tag != null &&
                 pointInfo.Series.Tag.Equals("FromTheme")) || pointInfo.Series.TrackBallLabelTemplate == null)

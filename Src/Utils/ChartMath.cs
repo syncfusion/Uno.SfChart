@@ -92,26 +92,6 @@ namespace Syncfusion.UI.Xaml.Charts
         }
 
         /// <summary>
-        /// Method used to get the normal.
-        /// </summary>
-        /// <param name="v1"></param>
-        /// <param name="v2"></param>
-        /// <param name="v3"></param>
-        /// <returns></returns>
-        public static Vector3D GetNormal(Vector3D v1, Vector3D v2, Vector3D v3)
-        {
-            Vector3D n = (v1 - v2) * (v3 - v2);
-            double l = n.GetLength();
-
-            if (l < Epsilon)
-            {
-                l = 0;
-            }
-
-            return new Vector3D(n.X / l, n.Y / l, n.Z / l);
-        }
-
-        /// <summary>
         /// Solves quadratic equation in form a*x^2 + b*x + c = 0
         /// </summary>
         /// <param name="a">The A component</param>

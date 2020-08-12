@@ -22,11 +22,7 @@
                         <BitmapIcon UriSource="BarChart.png"/>
                     </NavigationViewItem.Icon>
                 </NavigationViewItem>
-            <NavigationViewItem Tapped="NavigationViewItem_Tapped"  Content="Scatter Chart" Tag="Scatter">
-                <NavigationViewItem.Icon>
-                    <BitmapIcon UriSource="ScatterChart.png"/>
-                </NavigationViewItem.Icon>
-            </NavigationViewItem>
+            
             <NavigationViewItem  Tapped="NavigationViewItem_Tapped" Content="Line Chart" Tag="Line">
                     <NavigationViewItem.Icon>
                         <BitmapIcon UriSource="LineChart.png"/>
@@ -40,6 +36,16 @@
             <NavigationViewItem  Tapped="NavigationViewItem_Tapped" Content="Bubble Chart" Tag="Bubble">
                 <NavigationViewItem.Icon>
                     <BitmapIcon UriSource="BubbleChart.png"/>
+                </NavigationViewItem.Icon>
+            </NavigationViewItem>
+<NavigationViewItem Tapped="NavigationViewItem_Tapped"  Content="Scatter Chart" Tag="Scatter">
+                <NavigationViewItem.Icon>
+                    <BitmapIcon UriSource="ScatterChart.png"/>
+                </NavigationViewItem.Icon>
+            </NavigationViewItem>
+            <NavigationViewItem  Tapped="NavigationViewItem_Tapped" Content="Axis Type" Tag="Axis">
+                <NavigationViewItem.Icon>
+                    <BitmapIcon UriSource="axis.png"/>
                 </NavigationViewItem.Icon>
             </NavigationViewItem>
             <NavigationViewItem  Tapped="NavigationViewItem_Tapped" Content="Pie Chart" Tag="Pie" >

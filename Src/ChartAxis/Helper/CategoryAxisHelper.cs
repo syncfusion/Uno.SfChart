@@ -65,27 +65,16 @@ namespace Syncfusion.UI.Xaml.Charts
         {
             var isIndexed = (actualSeries is WaterfallSeries || actualSeries is HistogramSeries ||
                 actualSeries is ErrorBarSeries || actualSeries is PolarRadarSeriesBase) ?
-                true : (axis is ChartAxisBase2D)
-                ? (axis as CategoryAxis).IsIndexed
-                : (axis as CategoryAxis3D).IsIndexed;
+                true : (axis as CategoryAxis).IsIndexed;
             if (actualSeries != null)
             {
-                var series3D = actualSeries as XyzDataSeries3D;
-                var axis3D = axis as ChartAxisBase3D;
-                var isZAxis = axis3D != null && axis3D.IsZAxis;
                 IEnumerable pointValues;
                 ChartValueType valueType;
 
-                if (isZAxis)
-                {
-                    pointValues = series3D.ActualZValues;
-                    valueType = series3D.ZAxisValueType;
-                }
-                else
-                {
-                    pointValues = actualSeries.ActualXValues;
-                    valueType = actualSeries.XAxisValueType;
-                }
+
+                pointValues = actualSeries.ActualXValues;
+                valueType = actualSeries.XAxisValueType;
+
 
                 var values = pointValues as List<double>;
                 if (values != null && pos < values.Count && pos >= 0)
@@ -135,19 +124,11 @@ namespace Syncfusion.UI.Xaml.Charts
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Performance", "CA1800:DoNotCastUnnecessarily")]
         internal static void GenerateVisibleLabels(ChartAxis axis, LabelPlacement labelPlacement)
         {
-            if (axis is ChartAxisBase3D && (axis as ChartAxisBase3D).IsManhattanAxis)
-            {
-                for (int i = 0; i < axis.RegisteredSeries.Count; i++)
-                {
-                    var label = (axis.RegisteredSeries[i] as CartesianSeries3D).Label;
-                    axis.VisibleLabels.Add(new ChartAxisLabel(i, (string.IsNullOrEmpty(label) ? "Series " + (i + 1) : label), i));
-                }
-            }
-            else
+
             {
                 var actualSeries =
                     axis.Area.VisibleSeries
-                        .Where(series => series.ActualXAxis == axis || ((series is XyzDataSeries3D ? (series as XyzDataSeries3D).ActualZAxis : null) == axis))
+                        .Where(series => series.ActualXAxis == axis)
                         .Max(filteredSeries => filteredSeries.DataCount);
 
                 actualSeries = actualSeries != null ? actualSeries : axis.Area is SfChart ? (axis.Area as SfChart).TechnicalIndicators.Where(series => series.ActualXAxis == axis)
@@ -162,9 +143,7 @@ namespace Syncfusion.UI.Xaml.Charts
                 var isPolarRadarSeries = actualSeries is PolarRadarSeriesBase;
                 var isIndexed = (actualSeries is WaterfallSeries || actualSeries is HistogramSeries
                     || actualSeries is ErrorBarSeries || isPolarRadarSeries) ?
-                    true : (axis is ChartAxisBase2D)
-                    ? (axis as CategoryAxis).IsIndexed
-                    : (axis as CategoryAxis3D).IsIndexed;
+                    true : (axis as CategoryAxis).IsIndexed;
                 count = isIndexed ? actualSeries.DataCount : actualSeries.DistinctValuesIndexes.Count;
                 for (; position <= visibleRange.End; position += interval)
                 {
@@ -328,9 +307,7 @@ namespace Syncfusion.UI.Xaml.Charts
 
                 var aggregateValue = series.ActualXAxis is CategoryAxis
                     ? (series.ActualXAxis as CategoryAxis).AggregateFunctions
-                    : series.ActualXAxis is CategoryAxis3D
-                        ? (series.ActualXAxis as CategoryAxis3D).AggregateFunctions
-                        : AggregateFunctions.None;
+                    :  AggregateFunctions.None;
 
                 if (aggregateValue != AggregateFunctions.None)
                 {

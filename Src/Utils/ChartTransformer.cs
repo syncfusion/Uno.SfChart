@@ -177,15 +177,11 @@ namespace Syncfusion.UI.Xaml.Charts
 
                 //WPF-25942: Invalid Cast Exception is thrown in ChartCartesianTransformer when OS set to French
                 ChartAxis logXAxis = null;
-                if (XAxis is LogarithmicAxis3D)
-                    logXAxis = XAxis as LogarithmicAxis3D;
-                else if (XAxis is LogarithmicAxis)
+                 if (XAxis is LogarithmicAxis)
                     logXAxis = XAxis as LogarithmicAxis;
 
                 ChartAxis logYAxis=null;
-                if (YAxis is LogarithmicAxis3D)
-                    logYAxis = YAxis as LogarithmicAxis3D;
-                else if (YAxis is LogarithmicAxis)
+                if (YAxis is LogarithmicAxis)
                     logYAxis = YAxis as LogarithmicAxis;
 
                 if (logXAxis != null)
@@ -193,8 +189,7 @@ namespace Syncfusion.UI.Xaml.Charts
                     x_IsLogarithmic = true;
                     if (logXAxis is LogarithmicAxis)
                         xlogarithmicBase = ((LogarithmicAxis) series.ActualXAxis).LogarithmicBase;
-                    else
-                        xlogarithmicBase = ((LogarithmicAxis3D) series.ActualXAxis).LogarithmicBase;
+                   
                 }
 
                 if (logYAxis != null)
@@ -202,24 +197,11 @@ namespace Syncfusion.UI.Xaml.Charts
                     y_IsLogarithmic = true;
                     if (logYAxis is LogarithmicAxis)
                         ylogarithmicBase = ((LogarithmicAxis) series.ActualYAxis).LogarithmicBase;
-                    else
-                        ylogarithmicBase = ((LogarithmicAxis3D) series.ActualYAxis).LogarithmicBase;
+                   
                 }
                 m_IsRoated = series.IsActualTransposed; //When we rotate Second series defined with XAxis and YAxis then series not render.
 
-                var zseries = (series as XyzDataSeries3D);
-                if (zseries != null && !string.IsNullOrEmpty(zseries.ZBindingPath))
-                {
-                    ZAxis = zseries.ActualZAxis;
-                                     
-                     var  logZAxis = ZAxis as LogarithmicAxis3D;
-
-                    if (logZAxis != null)
-                    {
-                        z_IsLogarithmic = true;
-                        zlogarithmicBase = logZAxis.LogarithmicBase;
-                    }
-                }
+               
             }
             #endregion
 
@@ -262,45 +244,6 @@ namespace Syncfusion.UI.Xaml.Charts
                 }
                 
                 return new Point(0, 0);
-            }
-
-            /// <summary>
-            /// Transforms chart cordinates to real coordinates.
-            /// </summary>
-            /// <param name="x">The x value.</param>
-            /// <param name="y">The y value.</param>
-            /// <param name="z">The y value.</param>
-            /// <returns>The visible point</returns>
-            internal Vector3D TransformToVisible3D(double x, double y, double z)
-            {
-                if (XAxis != null && YAxis != null && !double.IsNaN(m_viewport.Width) && !double.IsNaN(m_viewport.Height)
-                    && ZAxis != null && !double.IsNaN(m_viewport.Width)  && !double.IsNaN(m_viewport.Height))
-                {
-                    ChartBase area = XAxis.Area;
-                    x = x = x_IsLogarithmic && x > 0 ? Math.Log(x, xlogarithmicBase) : x;
-                    y = y_IsLogarithmic && y > 0 ? Math.Log(y, ylogarithmicBase) : y;
-                    z = z_IsLogarithmic && z > 0 ? Math.Log(z, zlogarithmicBase) : z;
-                    var isSfChart = area is SfChart;
-                    double depth = isSfChart ? ZAxis.RenderedRect.Left - ZAxis.Area.SeriesClipRect.Left : ZAxis.RenderedRect.Left;
-
-
-                    if (this.m_IsRoated)
-                    {
-                        double left = isSfChart ? YAxis.RenderedRect.Left - XAxis.Area.SeriesClipRect.Left : YAxis.RenderedRect.Left;
-                        double top = isSfChart ? XAxis.RenderedRect.Top - YAxis.Area.SeriesClipRect.Top : XAxis.RenderedRect.Top;                       
-                        return new Vector3D(left + YAxis.RenderedRect.Width * YAxis.ValueToCoefficientCalc(y), top + XAxis.RenderedRect.Height * (1 - XAxis.ValueToCoefficientCalc(x))
-                            , depth + Math.Round(ZAxis.RenderedRect.Width * ZAxis.ValueToCoefficientCalc(z)));
-                    }
-                    else
-                    {
-                        double left = isSfChart ? XAxis.RenderedRect.Left - XAxis.Area.SeriesClipRect.Left : XAxis.RenderedRect.Left;
-                        double top = isSfChart ? YAxis.RenderedRect.Top - YAxis.Area.SeriesClipRect.Top : YAxis.RenderedRect.Top;
-                        return new Vector3D(left + Math.Round(XAxis.RenderedRect.Width * XAxis.ValueToCoefficientCalc(x)), top + Math.Round(YAxis.RenderedRect.Height * (1 - YAxis.ValueToCoefficientCalc(y)))
-                            , depth + Math.Round(ZAxis.RenderedRect.Width * ZAxis.ValueToCoefficientCalc(z)));
-                    }
-                }
-
-                return new Vector3D(0, 0, 0);
             }
 
             /// <summary>
@@ -459,194 +402,6 @@ namespace Syncfusion.UI.Xaml.Charts
             }
         }
 
-        /// <summary>
-        /// Represents a ChartTransform3D class implementation. 
-        /// </summary>
-        /// <seealso cref="Syncfusion.UI.Xaml.Charts.IChartTransformer" />
-        public partial class ChartTransform3D : IChartTransformer
-        {
-            #region Members
-            Matrix3D perspective = Matrix3D.GetIdentity();
-            private bool needUpdate = true;
-            private Matrix3D centeredMatrix = Matrix3D.Identity;
-            private Matrix3D viewMatrix = Matrix3D.Identity;
-            private Matrix3D resultMatrix = Matrix3D.Identity;
-            /// <summary>
-            /// Initializes mviewport
-            /// </summary>
-            internal Size mViewport = Size.Empty;
-            #endregion
-
-            #region ctor
-
-            public ChartTransform3D(Size viewPort)
-            {
-                mViewport = viewPort;
-            }
-
-            #endregion
-
-            #region Properties
-
-            internal double Rotation { get; set; }
-
-            internal double PerspectiveAngle { get; set; }
-
-            internal double Tilt { get; set; }
-
-            internal double Depth { get; set; }
-
-            /// <summary>
-            /// Gets or sets the centered matrix.
-            /// </summary>
-            public Matrix3D Centered
-            {
-                get
-                {
-                    return centeredMatrix;
-                }
-                set
-                {
-                    if (centeredMatrix == value) return;
-                    centeredMatrix = value;
-                    needUpdate = true;
-                }
-            }
-
-            /// <summary>
-            /// Gets or sets the view matrix.
-            /// </summary>
-            /// <value>The view.</value>
-            public Matrix3D View
-            {
-                get
-                {
-                    return viewMatrix;
-                }
-
-                set
-                {
-                    if (viewMatrix == value) return;
-                    viewMatrix = value;
-                    needUpdate = true;
-                }
-            }
-
-            /// <summary>
-            /// Gets the result matrix.
-            /// </summary>
-            /// <value>The result.</value>
-            public Matrix3D Result
-            {
-                get
-                {
-                    if (!needUpdate) return resultMatrix;
-                    resultMatrix = Matrix3D.GetInvertal(centeredMatrix)*
-                                   perspective*viewMatrix*centeredMatrix;
-                    needUpdate = false;
-
-                    return resultMatrix;
-                }
-            }
-
-            #endregion
-
-            #region methods
-            public Size Viewport
-            {
-                get
-                {
-                    return mViewport;
-                }
-            }
-
-            /// <summary>
-            /// Method used to get the visible transform points.
-            /// </summary>
-            /// <param name="x"></param>
-            /// <param name="y"></param>
-            /// <returns></returns>
-            public Point TransformToVisible(double x, double y)
-            {
-                throw new NotImplementedException();
-            }
-
-            internal void Transform()
-            {
-                var viewportWidth = mViewport.Width;
-                var viewportHeight = mViewport.Height;
-
-                if (viewportWidth == 0) return;
-                var vector3D = new Vector3D(Math.Cos(Rotation * (3.14 / 180)) * viewportWidth, 0, Math.Sin(Rotation * (3.14 / 180)) * viewportWidth); 
-                SetCenter(new Vector3D(viewportWidth / 2, viewportHeight / 2, Depth / 2));
-                View = Matrix3D.Transform(0, 0, Depth);
-                View *= Matrix3D.Turn(-ChartMath.ToRadial * Rotation);
-                View *= Matrix3D.TiltArbitrary(-ChartMath.ToRadial * Tilt, vector3D);
-                UpdatePerspective(PerspectiveAngle);
-                needUpdate = true;
-            }
-
-            [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Performance", "CA1822:MarkMembersAsStatic", Justification = "Reviewed")]
-            protected double DegreeToRadianConverter(double degree)
-            {
-                return degree * Math.PI / 180;
-            }
-
-            private void UpdatePerspective(double angle)
-            {
-                var width = (((Viewport.Width + Viewport.Height) * Math.Tan(DegreeToRadianConverter((180 - Math.Abs(angle % 181)) / 2.0))) + (Depth * 2)/2);
-                perspective[0, 0] = width;
-                perspective[1, 1] = width;
-                perspective[2, 3] = 1;
-                perspective[3, 3] = width;
-            }
-
-            /// <summary>
-            /// Sets the center of world.
-            /// </summary>
-            /// <param name="center">The center.</param>
-            internal void SetCenter(Vector3D center)
-            {
-                centeredMatrix = Matrix3D.Transform(-center.X, -center.Y, -center.Z);
-                needUpdate = true;
-            }
-
-            /// <param name="vector3D">The vector3d.</param>
-            /// <returns></returns>
-            public Point ToScreen(Vector3D vector3D)
-            {
-                vector3D = Result * vector3D;
-                return new Point((float)vector3D.X, (float)vector3D.Y);
-            }
-
-            /// <summary>
-            /// Returns the intercept point of mouse ray with the specified plane.
-            /// </summary>
-            /// <param name="point">The point.</param>
-            /// <param name="plane">The plane.</param>
-            /// <returns></returns>
-            public Vector3D ToPlane(Point point, Polygon3D plane)
-            {
-                var vec1 = new Vector3D(point.X, point.Y, 0);
-                var vec2 = vec1 + new Vector3D(0, 0, 1);
-
-                vec1 = centeredMatrix * vec1;
-                vec2 = centeredMatrix * vec2;
-
-                vec1 = Matrix3D.GetInvertal(perspective) * vec1;
-                vec2 = Matrix3D.GetInvertal(perspective) * vec2;
-
-                vec1 = plane.GetPoint(vec1, vec2 - vec1);
-
-                vec1 = Matrix3D.GetInvertal(viewMatrix) * vec1;
-                vec1 = Matrix3D.GetInvertal(centeredMatrix) * vec1;
-
-                return vec1;
-            }
-
-            #endregion
-        }
-
         #region Implementation
         /// <summary>
         /// Creates the Cartesian transformer.
@@ -657,17 +412,6 @@ namespace Syncfusion.UI.Xaml.Charts
         public static IChartTransformer CreateSimple(Size viewport)
         {
             return new ChartSimpleTransformer(viewport);
-        }
-
-        /// <summary>
-        /// Creates the Cartesian transformer.
-        /// </summary>
-        /// <param name="viewport">The viewport.</param>
-        /// <returns>The Chart Transformer</returns>
-      
-        public static IChartTransformer CreateSimple3D(Size viewPort)
-        {
-            return new ChartTransform3D(viewPort);
         }
 
         /// <summary>

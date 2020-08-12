@@ -64,37 +64,7 @@ namespace Syncfusion.UI.Xaml.Charts
         /// <param name="smallTicksPerInterval">The small ticks per interval.</param>
         internal static void GenerateVisibleLabels3D(ChartAxis axis, object minimum, object maximum, object actualInterval, double smallTicksPerInterval)
         {
-            DoubleRange range = axis.VisibleRange;
-            double interval = axis.VisibleInterval;
-            double position;
-
-            if ((minimum != null && maximum != null && actualInterval != null) || axis.DesiredIntervalsCount != null
-                || axis.EdgeLabelsVisibilityMode == EdgeLabelsVisibilityMode.AlwaysVisible
-                || (axis.EdgeLabelsVisibilityMode == EdgeLabelsVisibilityMode.Visible))
-                position = range.Start;
-            else
-                position = range.Start - (range.Start % interval);
-
-            for (; position <= range.End; position += interval)
-            {
-                if (range.Inside(position))
-                {
-                    axis.VisibleLabels.Add(new ChartAxisLabel(position, axis.GetActualLabelContent(position), position));
-                }
-
-                if (axis.smallTicksRequired)
-                {
-                    axis.AddSmallTicksPoint(position);
-                }
-            }
-
-            if (((maximum != null && range.End.Equals(maximum))
-                || axis.EdgeLabelsVisibilityMode == EdgeLabelsVisibilityMode.AlwaysVisible
-                || (axis.EdgeLabelsVisibilityMode == EdgeLabelsVisibilityMode.Visible))
-                && !range.End.Equals(position - interval))
-            {
-                axis.VisibleLabels.Add(new ChartAxisLabel(range.End, axis.GetActualLabelContent(range.End), range.End));
-            }
+            
         }
 
         /// <summary>

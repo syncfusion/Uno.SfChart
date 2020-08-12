@@ -474,30 +474,16 @@ namespace Syncfusion.UI.Xaml.Charts
 
         public override void Update(IChartTransformer transformer)
         {
-            var adornment3D = this as ChartAdornment3D;
-            if (this.Series is XyzDataSeries3D && !string.IsNullOrEmpty((this.Series as XyzDataSeries3D).ZBindingPath))
-            {
-                var vector3D = (transformer as ChartTransform.ChartCartesianTransformer).TransformToVisible3D(XPos, YPos, adornment3D.StartDepth);
-                this.X = vector3D.X;
-                this.Y = vector3D.Y;
-                adornment3D.ActualStartDepth = vector3D.Z;
-            }
-            else
-            {
-                if (Series is RangeColumnSeries && !Series.IsMultipleYPathRequired)
-                {
-                    YPos = (Series.ActualYAxis.VisibleRange.End - Math.Abs(Series.ActualYAxis.VisibleRange.Start)) / 2;
-                }
 
-                Point point = transformer.TransformToVisible(XPos, YPos);
-                this.X = point.X;
-                this.Y = point.Y;
-
-                if (adornment3D != null)
-                {
-                    adornment3D.ActualStartDepth = adornment3D.StartDepth;
-                }
+            if (Series is RangeColumnSeries && !Series.IsMultipleYPathRequired)
+            {
+                YPos = (Series.ActualYAxis.VisibleRange.End - Math.Abs(Series.ActualYAxis.VisibleRange.Start)) / 2;
             }
+
+            Point point = transformer.TransformToVisible(XPos, YPos);
+            this.X = point.X;
+            this.Y = point.Y;
+
         }
 
         /// <summary>
@@ -627,8 +613,7 @@ namespace Syncfusion.UI.Xaml.Charts
 
         internal void BindColorProperties()
         {
-            var isGrouping = (Series.ActualXAxis is CategoryAxis) ? (Series.ActualXAxis as CategoryAxis).IsIndexed :
-            (Series.ActualXAxis is CategoryAxis3D) ? (Series.ActualXAxis as CategoryAxis3D).IsIndexed : true;
+            var isGrouping = (Series.ActualXAxis is CategoryAxis) ? (Series.ActualXAxis as CategoryAxis).IsIndexed : true;
             if (Series is WaterfallSeries)
             {
                 var segment = Series.Segments.FirstOrDefault(seg => seg.Item == Item) as WaterfallSegment;
@@ -638,110 +623,37 @@ namespace Syncfusion.UI.Xaml.Charts
             }
             else if (!this.IsEmptySegmentInterior)
             {
-                Binding binding = new Binding();
-                binding.Source = Series;
-                binding.Path = new PropertyPath("Interior");
-                binding.Converter = new InteriorConverter(Series);
+                Binding binding1 = new Binding();
+                binding1.Source = Series;
+                binding1.Path = new PropertyPath("Interior");
+                binding1.Converter = new InteriorConverter(Series);
                 if (Series is CircularSeriesBase && !double.IsNaN(((CircularSeriesBase)Series).GroupTo))
-                    binding.ConverterParameter = Series.Adornments.IndexOf(this);
+                    binding1.ConverterParameter = Series.Adornments.IndexOf(this);
                 else if (!isGrouping && (Series.IsSideBySide && (!(Series is RangeSeriesBase)) && (!(Series is FinancialSeriesBase))))
-                    binding.ConverterParameter = Series.GroupedActualData.IndexOf(Item);
+                    binding1.ConverterParameter = Series.GroupedActualData.IndexOf(Item);
                 else
-                    binding.ConverterParameter = Series is HistogramSeries ? Series.Adornments.IndexOf(this) : Series.ActualData.IndexOf(Item);
-                BindingOperations.SetBinding(this, ChartSegment.InteriorProperty, binding);
+                    binding1.ConverterParameter = Series is HistogramSeries ? Series.Adornments.IndexOf(this) : Series.ActualData.IndexOf(Item);
+                BindingOperations.SetBinding(this, ChartSegment.InteriorProperty, binding1);
             }
             else
             {
-                Binding binding = new Binding();
-                binding.Source = Series;
-                binding.ConverterParameter = Series.Interior;
-                binding.Path = new PropertyPath("EmptyPointInterior");
-                binding.Converter = new MultiInteriorConverter();
-                BindingOperations.SetBinding(this, ChartSegment.InteriorProperty, binding);
+                Binding binding1 = new Binding();
+                binding1.Source = Series;
+                binding1.ConverterParameter = Series.Interior;
+                binding1.Path = new PropertyPath("EmptyPointInterior");
+                binding1.Converter = new MultiInteriorConverter();
+                BindingOperations.SetBinding(this, ChartSegment.InteriorProperty, binding1);
             }
 
-            if (!(this is ChartAdornment3D))
-            {
-                Binding binding = new Binding();
-                binding.Source = Series;
-                binding.Path = new PropertyPath("Stroke");
-                BindingOperations.SetBinding(this, ChartSegment.StrokeProperty, binding);
+            Binding binding = new Binding();
+            binding.Source = Series;
+            binding.Path = new PropertyPath("Stroke");
+            BindingOperations.SetBinding(this, ChartSegment.StrokeProperty, binding);
 
-                binding = new Binding();
-                binding.Source = Series;
-                binding.Path = new PropertyPath("StrokeThickness");
-                BindingOperations.SetBinding(this, ChartSegment.StrokeThicknessProperty, binding);
-            }
-        }
-
-        #endregion
-
-        #endregion
-    }
-
-    /// <summary>
-    /// Represents a ChartAdornment that used to render 3D element in chart.
-    /// </summary>
-    /// <seealso cref="Syncfusion.UI.Xaml.Charts.ChartAdornment" />
-    public partial class ChartAdornment3D : ChartAdornment
-    {
-        #region Properties
-
-        #region Internal Properties
-
-        internal double StartDepth { get; set; }
-
-        internal double ActualStartDepth { get; set; }
-
-        #endregion
-
-        #endregion
-
-        #region Constructors
-
-        public ChartAdornment3D()
-        {
-
-        }
-
-        /// <summary>
-        /// Called when instance created for ChartAdornment
-        /// </summary>
-        /// <param name="xVal"></param>
-        /// <param name="yVal"></param>
-        /// <param name="x"></param>
-        /// <param name="y"></param>
-        /// <param name="startDepth"></param>
-        /// <param name="series"></param>
-        public ChartAdornment3D(double xVal, double yVal, double x, double y, double startDepth, ChartSeriesBase series)
-        {
-            StartDepth = startDepth;
-            XData = xVal;
-            YData = yVal;
-            XPos = x;
-            YPos = y;
-            Series = series;
-        }
-
-        #endregion
-
-        #region Methods
-
-        #region Public Override Methods
-
-        /// <summary>
-        /// Sets the values for this segment. This method is not
-        /// intended to be called explicitly outside the Chart but it can be overriden by
-        /// any derived class.
-        /// </summary>
-        /// <param name="Values"></param>
-        public override void SetData(params double[] Values)
-        {
-            XData = Values[0];
-            YData = Values[1];
-            XPos = Values[2];
-            YPos = Values[3];
-            StartDepth = Values[4];
+            binding = new Binding();
+            binding.Source = Series;
+            binding.Path = new PropertyPath("StrokeThickness");
+            BindingOperations.SetBinding(this, ChartSegment.StrokeThicknessProperty, binding);
         }
 
         #endregion
@@ -1036,179 +948,4 @@ namespace Syncfusion.UI.Xaml.Charts
         #endregion
     }
 
-    /// <summary>
-    /// Represents a ChartAdornment that used to render visual in 3D chart.
-    /// </summary>
-    /// <seealso cref="Syncfusion.UI.Xaml.Charts.ChartAdornment3D" />
-    public partial class ChartPieAdornment3D : ChartAdornment3D
-    {
-        #region Fields
-
-        #region Private Fields
-
-        double angle;
-
-        double radius;
-
-        readonly int pieIndex;
-
-        #endregion
-
-        #endregion
-
-        #region Constructor
-
-        /// <summary>
-        /// Called when instance created for ChartPieAdornment
-        /// </summary>
-        /// <param name="xVal"></param>
-        /// <param name="yVal"></param>
-        /// <param name="angle"></param>
-        /// <param name="radius"></param>
-        /// <param name="series"></param>
-        public ChartPieAdornment3D(double startDepth, double xVal, double yVal, double angle, double radius, ChartSeries3D series)
-        {
-            pieIndex = (from pieSeries in series.ActualArea.VisibleSeries where pieSeries is PieSeries3D select pieSeries).ToList().IndexOf(series);
-        }
-
-        public ChartPieAdornment3D()
-        {
-
-        }
-
-        #endregion
-
-        #region Properties
-
-        #region Public Properties
-
-        /// <summary>
-        /// Gets or sets Angle property 
-        /// </summary>
-
-        public double Angle
-        {
-            get
-            {
-                return angle;
-            }
-            internal set
-            {
-                angle = value;
-                OnPropertyChanged("Angle");
-            }
-        }
-        /// <summary>
-        /// Gets or sets Radius property
-        /// </summary>
-
-        public double Radius
-        {
-            get
-            {
-                return radius;
-            }
-            internal set
-            {
-                radius = value;
-                OnPropertyChanged("Radius");
-            }
-        }
-
-        #endregion
-
-        #endregion
-
-        #region Methods
-
-        #region Public Override Methods
-
-        /// <summary>
-        /// Sets the values for this segment. This method is not
-        /// intended to be called explicitly outside the Chart but it can be overridden by
-        /// any derived class.
-        /// </summary>
-        /// <param name="values"></param>
-        public override void SetData(params double[] values)
-        {
-            XPos = XData = values[0];
-            YPos = YData = values[1];
-            Angle = values[2];
-            Radius = values[3];
-        }
-
-        /// <summary>
-        /// Updates the segments based on its data point value. This method is not
-        /// intended to be called explicitly outside the Chart but it can be overriden by
-        /// any derived class.
-        /// </summary>
-        /// <param name="transformer">Represents the view port of chart control.(refer <see cref="IChartTransformer"/>)</param>
-
-        public override void Update(IChartTransformer transformer)
-        {
-            double radius = Radius;
-            double actualRadius = Math.Min(transformer.Viewport.Width, transformer.Viewport.Height) / 2;
-            if (Series is DoughnutSeries3D)
-            {
-                var hostSeries = Series as DoughnutSeries3D;
-                double doughnutSeriesCount = hostSeries.GetCircularSeriesCount();
-                actualRadius *= hostSeries.InternalCircleCoefficient;
-                Point center = hostSeries.Center;
-                if (doughnutSeriesCount > 1)
-                    center = new Point(transformer.Viewport.Width / 2, transformer.Viewport.Height / 2);
-                double remainingWidth = actualRadius - (actualRadius * Series.ActualArea.InternalDoughnutHoleSize);
-                double equalParts = remainingWidth / doughnutSeriesCount;
-                double innerRadius = radius - (equalParts * hostSeries.InternlDoughnutCoefficient);
-                innerRadius = ChartMath.MaxZero(innerRadius);
-
-                if (hostSeries.ExplodeIndex == hostSeries.Segments.Count - 1 || hostSeries.ExplodeAll)
-                {
-                    var rect = new Rect(0, 0, transformer.Viewport.Width, transformer.Viewport.Height);
-                    center = hostSeries.GetActualCenter(new Point(rect.X + rect.Width / 2, rect.Y + rect.Height / 2), Radius);
-                }
-                if (hostSeries != null && hostSeries.LabelPosition == CircularSeriesLabelPosition.Inside)
-                {
-                    double difference = (radius - innerRadius) / 2;
-                    radius -= difference;
-                }
-
-                this.X = center.X + radius * Math.Cos(Angle);
-                this.Y = center.Y + radius * Math.Sin(Angle);
-            }
-
-            else if (Series is PieSeries3D)
-            {
-                var hostSeries = Series as PieSeries3D;
-                Point center = hostSeries.Center;
-                double pieSeriesCount = hostSeries.GetCircularSeriesCount();
-                double equalParts = actualRadius / pieSeriesCount;
-                double innerRadius = equalParts * pieIndex;
-
-                if (hostSeries.ExplodeIndex == hostSeries.Segments.Count - 1 || hostSeries.ExplodeAll)
-                {
-                    var rect = new Rect(0, 0, transformer.Viewport.Width, transformer.Viewport.Height);
-                    center = hostSeries.GetActualCenter(new Point(rect.X + rect.Width / 2, rect.Y + rect.Height / 2), Radius);
-                }
-                if (hostSeries != null && hostSeries.LabelPosition == CircularSeriesLabelPosition.Inside)
-                {
-                    if (pieIndex == 0)
-                    {
-                        radius = radius / 2;
-                    }
-                    else
-                    {
-                        double difference = (radius - innerRadius) / 2;
-                        radius -= difference;
-                    }
-                }
-                this.X = center.X + radius * Math.Cos(Angle);
-                this.Y = center.Y + radius * Math.Sin(Angle);
-            }
-            this.ActualStartDepth = this.StartDepth;
-        }
-
-        #endregion
-
-        #endregion
-    }
 }
