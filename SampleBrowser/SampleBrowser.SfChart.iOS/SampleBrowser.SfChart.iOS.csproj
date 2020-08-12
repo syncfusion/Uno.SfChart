@@ -112,6 +112,7 @@
     <BundleResource Include="BubbleChart.png" />
     <BundleResource Include="ColumnChart.png" />
     <BundleResource Include="DoughnutChart.png" />
+    <BundleResource Include="axis.png" />
     <Content Include="Entitlements.plist" />
     <BundleResource Include="Resources\SplashScreen%402x.png" />
     <BundleResource Include="Resources\SplashScreen%403x.png" />

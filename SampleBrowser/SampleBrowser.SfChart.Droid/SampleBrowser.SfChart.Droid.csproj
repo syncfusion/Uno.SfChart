@@ -103,6 +103,9 @@
     <Content Include="..\SampleBrowser.SfChart.iOS\AreaChart.png">
       <Link>AreaChart.png</Link>
     </Content>
+    <Content Include="..\SampleBrowser.SfChart.iOS\axis.png">
+      <Link>axis.png</Link>
+    </Content>
     <Content Include="..\SampleBrowser.SfChart.iOS\BarChart.png">
       <Link>BarChart.png</Link>
     </Content>
