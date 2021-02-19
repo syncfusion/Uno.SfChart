@@ -9,7 +9,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GettingStarted.SfChart.Droi
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GettingStarted.SfChart.iOS", "GettingStarted.SfChart.iOS\GettingStarted.SfChart.iOS.csproj", "{60246FA7-0453-4784-BB7C-C99C72CA40FC}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GettingStarted.SfChart.Wasm", "GettingStarted.SfChart.Wasm\GettingStarted.SfChart.Wasm.csproj", "{43B00842-699F-4FD0-902D-1452B8A6C285}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GettingStarted.SfChart.Wasm", "GettingStarted.SfChart.Wasm\GettingStarted.SfChart.Wasm.csproj", "{43B00842-699F-4FD0-902D-1452B8A6C285}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Syncfusion.SfChart.Uno", "..\Src\Syncfusion.SfChart.Uno.csproj", "{FB5B84D0-91F2-41A1-9D77-2C7538ECF94B}"
 EndProject

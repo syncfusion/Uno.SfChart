@@ -16,7 +16,7 @@
     <DefineConstants>TRACE;NETFX_CORE;WINDOWS_UAP;SyncfusionFramework4_6;UNIVERSALWINDOWS;Uno;</DefineConstants>
   </PropertyGroup>
   <ItemGroup Condition="'$(TargetFramework)'=='xamarinios10' or '$(TargetFramework)'=='monoandroid90' or '$(TargetFramework)'=='netstandard2.0'">
-    <PackageReference Include="Uno.UI" Version="3.0.0-dev.1004" />
+    <PackageReference Include="Uno.UI" Version="3.5.1" />
   </ItemGroup>
   <PropertyGroup Condition="'$(TargetFramework)'=='monoandroid90'">
     <DesignTimeBuild>false</DesignTimeBuild>
