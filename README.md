@@ -1,5 +1,5 @@
-# Syncfusion Uno Chart Control
-**SfChart** provides a perfect way to visualize data with a high level of user interactivity that focuses on development, productivity and simplicity of use. **SfChart** also provides a wide variety of charting features that are used to visualize large quantities of data, flexible data binding and user customization.
+# Syncfusion Uno Chart Control - Beta
+**Chart** provides a perfect way to visualize data with a high level of user interactivity that focuses on development, productivity and simplicity of use. **Chart** also provides a wide variety of charting features that are used to visualize large quantities of data, flexible data binding and user customization.
 
 <img width="700" src="/Images/SyncfusionUnoChart.gif">
 
