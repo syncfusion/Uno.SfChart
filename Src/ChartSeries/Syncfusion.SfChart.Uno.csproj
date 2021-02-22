@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project Sdk="MSBuild.Sdk.Extras/2.0.54">
   <PropertyGroup>
-    <TargetFrameworks>netstandard2.0;xamarinios10;monoandroid90;uap10.0.18362</TargetFrameworks>
+    <TargetFrameworks>netstandard2.0;xamarinios10;monoandroid10.0;uap10.0.18362</TargetFrameworks>
     <!-- Ensures the .xr.xml files are generated in a proper layout folder -->
     <GenerateLibraryLayout>true</GenerateLibraryLayout>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
@@ -16,10 +16,10 @@
 		<WarningLevel>0</WarningLevel>
 		<GenerateSerializationAssemblies>On</GenerateSerializationAssemblies>
 	</PropertyGroup>
-  <PropertyGroup Condition="'$(TargetFramework)'=='xamarinios10'  or '$(TargetFramework)'=='monoandroid90' or '$(TargetFramework)'=='uap10.0.18362'">
+  <PropertyGroup Condition="'$(TargetFramework)'=='xamarinios10'  or '$(TargetFramework)'=='monoandroid10.0' or '$(TargetFramework)'=='uap10.0.18362'">
     <DefineConstants>TRACE;NETFX_CORE;WINDOWS_UAP;SyncfusionFramework4_6;UNIVERSALWINDOWS;Uno;</DefineConstants>
   </PropertyGroup>
-  <PropertyGroup Condition="'$(TargetFramework)'=='monoandroid90'">
+  <PropertyGroup Condition="'$(TargetFramework)'=='monoandroid10.0'">
     <DesignTimeBuild>false</DesignTimeBuild>
   </PropertyGroup>
   <ItemGroup>
