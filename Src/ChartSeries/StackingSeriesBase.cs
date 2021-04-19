@@ -427,6 +427,7 @@ namespace Syncfusion.UI.Xaml.Charts
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Performance", "CA1809:AvoidExcessiveLocals", Justification = "Reviewed")]
         private void CalculateStackingValues()
         {
+            var isGrouped = ActualXAxis is CategoryAxis && !(ActualXAxis as CategoryAxis).IsIndexed;
             Area.StackedValues = new Dictionary<object, StackingValues>();
             var stackingSeries = from series in Area.VisibleSeries
                                  where series is StackingSeriesBase && series.ActualYAxis != null && series.ActualXAxis != null
@@ -460,7 +461,12 @@ namespace Syncfusion.UI.Xaml.Charts
                         values.EndValues = new List<double>();
                         IList<double> yValues;
                         yValues = ((XyDataSeries)chartSeries).YValues;
-                        List<double> xValues = ((XyDataSeries)chartSeries).GetXValues();
+                        List<double> xValues;
+                        if (isGrouped)
+                            xValues = ((XyDataSeries)chartSeries).GroupedXValuesIndexes;
+                        else
+                            xValues = ((XyDataSeries)chartSeries).GetXValues();
+
                         if (chartSeries.ActualXAxis is CategoryAxis && !(chartSeries.ActualXAxis as CategoryAxis).IsIndexed)
                         {
                             if (!(chartSeries is StackingColumn100Series) && !(chartSeries is StackingBar100Series)
