@@ -162,7 +162,7 @@ namespace Syncfusion.UI.Xaml.Charts
             double x1ChartVal, x2ChartVal, y1ChartVal, y2ChartVal;
             int i = dataPoint.Index;
             DoubleRange sbsInfo = this.GetSideBySideInfo(this);
-            List<double> xValues = (ActualXValues is List<double>) ? ActualXValues as List<double> : GetXValues();
+            List<double> xValues = GetStackingSeriesXValues(this);
 
             if (!this.IsIndexed)
             {
@@ -251,7 +251,7 @@ namespace Syncfusion.UI.Xaml.Charts
             double xStart, xEnd, yStart, yEnd, width, height, left, top;
             int i = dataPoint.Index;
             DoubleRange sbsInfo = this.GetSideBySideInfo(this);
-            List<double> xValues = (ActualXValues is List<double>) ? ActualXValues as List<double> : GetXValues();
+            List<double> xValues = GetStackingSeriesXValues(this);
 
             if (!this.IsIndexed)
             {
@@ -392,6 +392,11 @@ namespace Syncfusion.UI.Xaml.Charts
                     selectedSegmentPixels);
         }
 
+        private static List<double> GetStackingSeriesXValues(XyDataSeries chartseries)
+        {
+            return (chartseries.ActualXAxis is CategoryAxis && !(chartseries.ActualXAxis as CategoryAxis).IsIndexed) ? chartseries.GroupedXValuesIndexes : chartseries.GetXValues();
+        }
+
         #endregion
 
         #region Protected Methods
@@ -460,7 +465,7 @@ namespace Syncfusion.UI.Xaml.Charts
                         values.EndValues = new List<double>();
                         IList<double> yValues;
                         yValues = ((XyDataSeries)chartSeries).YValues;
-                        List<double> xValues = ((XyDataSeries)chartSeries).GetXValues();
+                        List<double> xValues = GetStackingSeriesXValues((XyDataSeries)chartSeries);
                         if (chartSeries.ActualXAxis is CategoryAxis && !(chartSeries.ActualXAxis as CategoryAxis).IsIndexed)
                         {
                             if (!(chartSeries is StackingColumn100Series) && !(chartSeries is StackingBar100Series)
