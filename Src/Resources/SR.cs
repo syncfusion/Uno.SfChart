@@ -49,7 +49,7 @@ namespace Syncfusion.UI.Xaml.Charts
                 }
                 if (Application.Current != null)
                 {
-                    ResourceLoader manager = ResourceLoader.GetForCurrentView("Syncfusion.SfChart.Uno/Syncfusion.SfChart.Uno.Resources");
+                    ResourceLoader manager = ResourceLoader.GetForCurrentView("Syncfusion.SfChart.Uno.Resources");
                     return manager;
                 }
             }
