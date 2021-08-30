@@ -1237,8 +1237,12 @@ namespace Syncfusion.UI.Xaml.Charts
                 }
                 else
                 {
-                    x = x + (Math.Cos(angle) * (explodedRadius - (radius * coefficient) / 10));
-                    y = y + (Math.Sin(angle) * (explodedRadius - (radius * coefficient) / 10));
+                    var points = GetAdornmentPositions(radius, new List<Rect>(), finalSize, adornment, adornmentIndex, pieLeft, pieRight, label, series, ref x, ref y, angle, series is PieSeries);
+                    //x = x + (Math.Cos(angle) * (explodedRadius - (radius * coefficient) / 10));
+                    //y = y + (Math.Sin(angle) * (explodedRadius - (radius * coefficient) / 10));
+                    x = points.First().X;
+                    y = points.First().Y;
+
                     renderingPoints.Add((new Point(x, y)));
                     x = x + (Math.Cos(angle) * connectorHeight);
                     y = y + (Math.Sin(angle) * connectorHeight);
@@ -1282,6 +1286,17 @@ namespace Syncfusion.UI.Xaml.Charts
                     }
 
                     renderingPoints.Add(new Point(x + lineEdge, y));
+
+                    if (ShowConnectorLine || (circularSeriesBase != null && circularSeriesBase.EnableSmartLabels))
+                    {
+                        var connectorLineMode = circularSeriesBase != null ? circularSeriesBase.ConnectorType : ConnectorMode.Line;
+                        DrawConnectorLine(adornmentIndex, renderingPoints, connectorLineMode, false, 0);
+                        if (ShowMarkerAtEdge2D && circularSeriesBase != null && ShowMarker && adormentContainers != null && adornmentIndex < adormentContainers.Count)
+                        {
+                            SetSymbolPosition(new Point(renderingPoints.Last().X, renderingPoints.Last().Y), adormentContainers[adornmentIndex]);
+                        }
+                    }
+
                     currRect.Y = y;
                     previousRect = currRect;
                     previousRectColl.Add(currRect);
