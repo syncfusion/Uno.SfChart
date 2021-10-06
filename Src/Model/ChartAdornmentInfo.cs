@@ -1196,7 +1196,7 @@ namespace Syncfusion.UI.Xaml.Charts
             pieLeft = pieLeft < baseLeft ? baseLeft : pieLeft;
 
             double explodRadius =0, angle;
-            ConnectorMode connectorMode;
+            ConnectorMode connectorMode = ConnectorMode.Line;
             int explodeIndex = -1;
             var circularSeriesBase = series as CircularSeriesBase;
             if (circularSeriesBase != null)
@@ -1286,6 +1286,8 @@ namespace Syncfusion.UI.Xaml.Charts
                     previousRect = currRect;
                     previousRectColl.Add(currRect);
                 }
+
+                DrawConnectorLine(adornmentIndex, renderingPoints, connectorMode);
 
                 if (!ShowLabel) continue;
                 var chartAdornmentInfo = this as ChartAdornmentInfo;
@@ -1397,7 +1399,7 @@ namespace Syncfusion.UI.Xaml.Charts
         /// <param name="connectorIndex">Index of the connector.</param>
         /// <param name="drawingPoints">The drawing points.</param>
         /// <param name="connectorLineMode">The connector line mode.</param>
-        internal void DrawConnectorLine(int connectorIndex, List<Point> drawingPoints, ConnectorMode connectorLineMode, bool is3DChart, double depth)
+        internal void DrawConnectorLine(int connectorIndex, List<Point> drawingPoints, ConnectorMode connectorLineMode)
         {
             if (ConnectorLines.Count <= connectorIndex) return;
             var element = ConnectorLines[connectorIndex];
@@ -2842,7 +2844,7 @@ namespace Syncfusion.UI.Xaml.Charts
 
                 var connectorAngle = isPie ? adornment.ConnectorRotationAngle : (6.28 * (1 - (adornment.ConnectorRotationAngle / 360.0)));
                 var points = GetAdornmentPositions(pieRadius, bounds, finalSize, adornment, adornmentIndex, pieLeft, pieRight, label, circularSeriesBase, ref x, ref y, connectorAngle, isPie);
-                DrawConnectorLine(adornmentIndex, points, connectorLineMode, false, 0);
+                DrawConnectorLine(adornmentIndex, points, connectorLineMode);
                 if (ShowMarkerAtEdge2D && circularSeriesBase != null && ShowMarker && adormentContainers != null && adornmentIndex < adormentContainers.Count)
                 {
                     SetSymbolPosition(new Point(points.Last().X, points.Last().Y), adormentContainers[adornmentIndex]);
@@ -2967,7 +2969,7 @@ namespace Syncfusion.UI.Xaml.Charts
         private void UpdateLabelPositionAndConnectorLine(double pieRadius, IList<Rect> bounds, Size finalSize, ChartAdornment adornment, int adornmentIndex, double pieLeft, double pieRight, FrameworkElement label, CircularSeriesBase circularSeriesBase, ref double x, ref double y, ConnectorMode connectorLineMode, bool is3D, int value, double connectorAngle, bool isPie)
         {
             var points = GetAdornmentPositions(pieRadius, bounds, finalSize, adornment, adornmentIndex, pieLeft, pieRight, label, circularSeriesBase, ref x, ref y, connectorAngle, isPie);
-            DrawConnectorLine(adornmentIndex, points, connectorLineMode, is3D, value);
+            DrawConnectorLine(adornmentIndex, points, connectorLineMode);
             ConnectorEndPoint = points[points.Count - 1];
             if (ShowMarkerAtEdge2D && circularSeriesBase != null && ShowMarker && adormentContainers != null && adornmentIndex < adormentContainers.Count)
             {
